@@ -1,0 +1,29 @@
+object DataModule1: TDataModule1
+  OldCreateOrder = False
+  Height = 291
+  HorizontalOffset = 474
+  VerticalOffset = 114
+  Width = 398
+  object MySQL57Conn: TMySQL57Connection
+    Connected = False
+    LoginPrompt = False
+    DatabaseName = 'wordscape'
+    KeepConnection = False
+    Params.Strings = (
+      'Port=3306'
+    )
+    Password = 'j33ves99'
+    Transaction = sqlTx
+    UserName = 'remote_user'
+    HostName = 'sherril-pc'
+    SkipLibraryVersionCheck = False
+    Left = 148
+    Top = 67
+  end
+  object sqlTx: TSQLTransaction
+    Active = False
+    Database = MySQL57Conn
+    Left = 152
+    Top = 182
+  end
+end

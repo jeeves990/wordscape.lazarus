@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="WordScapesProj.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos Y="19"/>
+        <UsageCount Value="31"/>
+      </Unit>
+      <Unit>
+        <Filename Value="WordScapes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="V"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="645"/>
+        <CursorPos X="39" Y="652"/>
+        <UsageCount Value="31"/>
+        <Bookmarks Count="1">
+          <Item0 Y="495" ID="2"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Logging.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="36" Y="10"/>
+        <UsageCount Value="31"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Frame4WS.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="_frame"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Frame"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="54" Y="6"/>
+        <UsageCount Value="31"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ClassT4T_frames.pas"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="58"/>
+        <CursorPos X="69" Y="63"/>
+        <UsageCount Value="31"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="processwords2db_controller.pp"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FrmPsWordsFile"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ProcessWords2Db_controller"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="233"/>
+        <CursorPos X="43" Y="249"/>
+        <UsageCount Value="31"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="loadwordsfromfile2db.pp"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FrmLoadFileDlg"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="LoadWordsFromFile2DB"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="53" Y="3"/>
+        <UsageCount Value="31"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="dmod_old.pp"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3"/>
+        <CursorPos X="60" Y="5"/>
+        <UsageCount Value="30"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="IDETheme.ActnCtrls.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="19"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="MyStringGrid.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="50" Y="8"/>
+        <UsageCount Value="19"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Words.lfm"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="9"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit>
+      <Unit>
+        <Filename Value="LoadFileDlg.lfm"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="9"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\DirFromCSV\frame4table.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="4"/>
+        <CursorPos X="11" Y="41"/>
+        <UsageCount Value="9"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\DirFromCSV\frmaddedit.lfm"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="547"/>
+        <CursorPos X="15" Y="570"/>
+        <UsageCount Value="9"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\lazarus_64\fpc\3.2.2\source\packages\fcl-db\src\sqldb\sqldb.pp"/>
+        <UnitName Value="SQLDB"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="558"/>
+        <CursorPos X="22" Y="586"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\lazarus_64\lcl\include\customform.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="3150"/>
+        <CursorPos Y="3167"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\lazarus_64\lcl\lclclasses.pp"/>
+        <UnitName Value="LCLClasses"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="138"/>
+        <CursorPos Y="160"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\lazarus_64\lcl\forms.pp"/>
+        <UnitName Value="Forms"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\lazarus_64\fpc\3.2.2\source\rtl\objpas\sysutils\syshelph.inc"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="worddmod.pp"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Word_Dmod"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="DataModule"/>
+        <UnitName Value="WordDmod"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="17"/>
+        <CursorPos Y="30"/>
+        <UsageCount Value="25"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="GetParams4Read.pas"/>
+        <ComponentName Value="FrmGetDbParams"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="63"/>
+        <CursorPos X="26" Y="81"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+      <Unit>
+        <Filename Value="GetParams4Read.lfm"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+        <DefaultSyntaxHighlighter Value="LFM"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Words.pas"/>
+        <IsPartOfProject Value="True"/>
+        <HasResources Value="True"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="361"/>
+        <CursorPos X="36" Y="393"/>
+        <UsageCount Value="21"/>
+        <Bookmarks Count="1">
+          <Item0 X="22" Y="213" ID="1"/>
+        </Bookmarks>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="29">
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+        <Caret Line="16" Column="40"/>
+      </Position>
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+        <Caret Line="11" Column="39"/>
+      </Position>
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+        <Caret Line="114" Column="7" TopLine="102"/>
+      </Position>
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+        <Caret Line="11" Column="39"/>
+      </Position>
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+        <Caret Line="120" Column="7" TopLine="108"/>
+      </Position>
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+        <Caret Line="11" Column="39"/>
+      </Position>
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+        <Caret Line="122" TopLine="104"/>
+      </Position>
+      <Position>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="666" Column="41" TopLine="644"/>
+      </Position>
+      <Position>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="11" Column="34"/>
+      </Position>
+      <Position>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="17" Column="31"/>
+      </Position>
+      <Position>
+        <Filename Value="GetParams4Read.pas"/>
+        <Caret Line="11" Column="31"/>
+      </Position>
+      <Position>
+        <Filename Value="processwords2db_controller.pp"/>
+        <Caret Line="249" Column="43" TopLine="233"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="109" Column="11" TopLine="91"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="222" Column="14" TopLine="204"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="81" TopLine="64"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="222" Column="18" TopLine="187"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="211" Column="51" TopLine="201"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="81" Column="30" TopLine="64"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="211" Column="51" TopLine="200"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="81" Column="32" TopLine="53"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="212" Column="30" TopLine="203"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="293" Column="28" TopLine="263"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="276" TopLine="262"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="329" Column="20" TopLine="314"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="88" Column="12" TopLine="70"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="386" TopLine="363"/>
+      </Position>
+      <Position>
+        <Filename Value="Words.pas"/>
+        <Caret Line="393" Column="36" TopLine="361"/>
+      </Position>
+      <Position>
+        <Filename Value="worddmod.pp"/>
+        <Caret Line="30" TopLine="17"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>

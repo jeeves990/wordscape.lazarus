@@ -1,0 +1,43 @@
+
+NameError: name 'columns' is not defined
+
+df1 = pandas.DataFrame([[2,4,6],[10,20,30]],columns=["aa","ab","ac"], rows=["row 0","row 1"])
+---------------------------------------------------------------------------
+TypeError                                 Traceback (most recent call last)
+<ipython-input-11-562248805c5e> in <module>
+----> 1 df1 = pandas.DataFrame([[2,4,6],[10,20,30]],columns=["aa","ab","ac"], rows=["row 0","row 1"])
+
+TypeError: __init__() got an unexpected keyword argument 'rows'
+
+df1 = pandas.DataFrame([[2,4,6],[10,20,30]],columns=["aa","ab","ac"])
+
+df1
+Out[13]: 
+   aa  ab  ac
+0   2   4   6
+1  10  20  30
+
+df1 = pandas.DataFrame([[2,4,6],[10,20,30]],columns=["aa","ab","ac"], index= ["First","Second"])
+
+df1
+Out[15]: 
+        aa  ab  ac
+First    2   4   6
+Second  10  20  30
+
+df2 = pandas.DataFrame([{First:Jack, "Last":"Blackmon"},{"First":"Sherril","Last":"Blackmon"},{}])
+---------------------------------------------------------------------------
+NameError                                 Traceback (most recent call last)
+<ipython-input-16-db4c89a172a5> in <module>
+----> 1 df2 = pandas.DataFrame([{First:Jack, "Last":"Blackmon"},{"First":"Sherril","Last":"Blackmon"},{}])
+
+NameError: name 'First' is not defined
+
+df2 = pandas.DataFrame([{"First":"Jack", "Last":"Blackmon"},{"First":"Sherril","Last":"Blackmon"},{}])
+
+df2
+Out[18]: 
+     First      Last
+0     Jack  Blackmon
+1  Sherril  Blackmon
+2      NaN       NaN

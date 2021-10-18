@@ -1,0 +1,46 @@
+object FrmLogging: TFrmLogging
+  Left = 0
+  Top = 0
+  Caption = 'FrmLogging'
+  ClientHeight = 388
+  ClientWidth = 625
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  OnCreate = FormCreate
+  DesignSize = (
+    625
+    388)
+  PixelsPerInch = 96
+  TextHeight = 13
+  object lblLogFileName: TLabel
+    Left = 8
+    Top = 8
+    Width = 67
+    Height = 13
+    Caption = 'Log file name:'
+  end
+  object sGrid: TStringGrid
+    Left = 7
+    Top = 32
+    Width = 610
+    Height = 266
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    ColCount = 3
+    TabOrder = 0
+  end
+  object edLogFileName: TEdit
+    Left = 92
+    Top = 5
+    Width = 526
+    Height = 21
+    Color = clMedGray
+    ReadOnly = True
+    TabOrder = 1
+    Text = 'edLogFileName'
+  end
+end

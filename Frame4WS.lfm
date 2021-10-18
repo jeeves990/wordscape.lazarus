@@ -1,0 +1,39 @@
+object _frame: T_frame
+  Left = 0
+  Top = 0
+  Width = 428
+  Height = 328
+  TabOrder = 0
+  OnResize = FrameResize
+  DesignSize = (
+    428
+    328)
+  object PnlFrameTop: TPanel
+    Left = 0
+    Top = 0
+    Width = 428
+    Height = 41
+    Align = alTop
+    BevelOuter = bvNone
+    Caption = 'Panel'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -13
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+    TabOrder = 0
+    ExplicitLeft = -336
+    ExplicitTop = -16
+  end
+  object sGrid: TStringGrid
+    Left = 4
+    Top = 51
+    Width = 419
+    Height = 272
+    Anchors = [akLeft, akTop, akRight, akBottom]
+    DefaultRowHeight = 18
+    Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goRowSizing, goColSizing]
+    TabOrder = 1
+  end
+end

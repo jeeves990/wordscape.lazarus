@@ -1,0 +1,35 @@
+object FrmDtaMod4WordScape: TFrmDtaMod4WordScape
+  OldCreateOrder = False
+  Height = 470
+  Width = 441
+  object FDQConnWords: TSQLQuery
+    Database = FCConnWords
+    SQL.Strings = (
+      'insert into words (word) values (:word)')
+    Left = 64
+    Top = 81
+  end
+  object FDConnWords: TSQLConnection
+    Databasename = 'WordScape'
+    Params.Strings = (
+      'User_Name=sherril'
+      'Database=wordscape'
+      'Server=sherril-pc'
+      'Password=j33ves99'
+      'DriverID=MySQL')
+    Connected = True
+    Left = 208
+    Top = 161
+  end
+  object FDQryWords: TSQLQuery 
+    Database = FDConnWords
+    SQL.Strings = (
+      'insert into words (word) values (:word)')
+    Left = 64
+    Top = 136
+  end
+  object FDTX: TSQLTransaction
+    Left = 65
+    Top = 208
+  end
+end

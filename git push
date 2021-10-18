@@ -1,0 +1,27 @@
+git push https://github.com/jeeves990/wordscape.git 
+
+-- change tag names if only local
+
+git tag new_tag_name old_tag_name
+git tag -d old_tag_name
+
+-- change branch names if local
+
+git branch -m <old-name> <new-name>
+
+-- switch {not sure exactly what this is}
+git switch -c bd665f50b5e9387b3291f4f0ecaa52fd0f206dba
+
+-- checkout
+git checkout HEAD  <<a branch name>>
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+To remove the file from the local staged changes list and cache we can use a simple command.
+
+git rm --cached <FILE>
+Here --cached removes the changes from local cache also.
+
+If the above command doesn’t look good enough to you, here is another approach. Alternatively, run this command and you should be good to go.
+
+git reset HEAD -- <file>
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++

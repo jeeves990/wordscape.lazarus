@@ -1,0 +1,160 @@
+object FrmPsWordsFile: TFrmPsWordsFile
+  Left = 2
+  Top = 2
+  Caption = 'FrmPsWordsFile'
+  ClientHeight = 489
+  ClientWidth = 635
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  Menu = MnMnuWords
+  OldCreateOrder = False
+  Position = poDesktopCenter
+  PixelsPerInch = 96
+  TextHeight = 13
+  object ToolBar1: TToolBar
+    Left = 0
+    Top = 0
+    Width = 635
+    Height = 29
+    ButtonHeight = 21
+    ButtonWidth = 126
+    Caption = 'ToolBar1'
+    ShowCaptions = True
+    TabOrder = 0
+    object ToolButton4: TToolButton
+      Left = 0
+      Top = 0
+      Action = ActGetFile
+      AutoSize = True
+    end
+    object ToolButton1: TToolButton
+      Left = 47
+      Top = 0
+      Action = ActLoadWords
+      AutoSize = True
+    end
+    object ToolButton2: TToolButton
+      Left = 155
+      Top = 0
+      Action = ActProcess
+      AutoSize = True
+    end
+    object ToolButton5: TToolButton
+      Left = 189
+      Top = 0
+      Action = ActGetDbParams
+      AutoSize = True
+    end
+    object ToolButton6: TToolButton
+      Left = 274
+      Top = 0
+      Action = ActWrtWords2Wordscape
+    end
+    object ToolButton3: TToolButton
+      Left = 400
+      Top = 0
+      Action = ActClose
+      AutoSize = True
+    end
+  end
+  object Acts4Words: TActionList
+    Left = 432
+    Top = 112
+    object ActLoadWords: TAction
+      Caption = 'Load words from file'
+      Enabled = False
+      OnExecute = ActLoadWordsExecute
+    end
+    object ActProcess: TAction
+      Caption = 'Ps...'
+    end
+    object ActClose: TAction
+      Caption = 'Close'
+      OnExecute = ActCloseExecute
+    end
+    object ActGetFile: TAction
+      Caption = 'Get File'
+      OnExecute = ActGetFileExecute
+    end
+    object ActGetDbParams: TAction
+      Caption = 'Open database'
+      Enabled = False
+      OnExecute = ActGetDbParamsExecute
+    end
+    object ActWrtWords2Wordscape: TAction
+      Caption = 'Write words to database'
+      Enabled = False
+    end
+    object ActLoad1st1000: TAction
+      Caption = 'Load 1st 1000 rows'
+    end
+    object ActLoadSelection: TAction
+      Caption = 'Make selection'
+      OnExecute = ActLoadSelectionExecute
+    end
+    object ActGetFromDb: TAction
+      Caption = 'Get words from database'
+    end
+  end
+  object OpnFlDlg: TFileOpenDialog
+    DefaultExtension = 'txt'
+    FavoriteLinks = <>
+    FileName = 'C:\Delphi Apps\WordScapes\words.txt'
+    FileTypes = <>
+    OkButtonLabel = 'Open file'
+    Options = []
+    Left = 112
+    Top = 392
+  end
+  object MnMnuWords: TMainMenu
+    Left = 456
+    Top = 208
+    object File1: TMenuItem
+      Caption = 'File'
+      object Findtextfile1: TMenuItem
+        Action = ActGetFile
+      end
+      object Loadwordsfromfile1: TMenuItem
+        Action = ActLoadWords
+        RadioItem = True
+        object TMenuItem
+        end
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
+      object Close1: TMenuItem
+        Caption = 'Close'
+        OnClick = Close1Click
+      end
+    end
+    object Writetodatabase1: TMenuItem
+      Caption = 'Write to database'
+      object N2: TMenuItem
+        Caption = '-'
+      end
+      object Opendatabase1: TMenuItem
+        Action = ActGetDbParams
+      end
+      object Writewordstodatabase1: TMenuItem
+        Action = ActWrtWords2Wordscape
+      end
+    end
+    object Retrievefromdatabase1: TMenuItem
+      Caption = 'Retrieve from database'
+      object Makeselection1: TMenuItem
+        Action = ActLoadSelection
+      end
+      object N3: TMenuItem
+        Caption = '-'
+      end
+      object Getwordsfromdatabase1: TMenuItem
+        Action = ActGetFromDb
+      end
+    end
+  end
+end
