@@ -1,48 +1,63 @@
 unit WordScapes;
 
 {$MODE Delphi}
+{$DEFINE SEEWORDS}
 
 interface
 
 uses
   windows, SysUtils, Variants, Classes, Graphics, Controls,
   Dialogs, ExtCtrls, StdCtrls, ComCtrls, Forms, Frame4WS,
+  frmCompWord_W_DB, WordscapeHelper,
   ProcessWords2Db_controller, Strings, IDETheme.ActnCtrls,
-  WordDmod, SQLDB, ActnList, GetParams4Read,
-	Menus;
+  WordDmod, SQLDB, ActnList, GetParams4Read, Regex,
+	Menus, Grids, MaskEdit, XMLPropStorage, Buttons;
 
 type
-
-
-	{ TNodeWalker }
-
-  TNodeWalker = class(TTreeView)
-  private
-    rootNode: TTreeNode;
-    FTree: TTreeView;
-    //Stack: TObjectStack;
-    procedure SetTree(const Value: TTreeView);
-    destructor Destroy; reintroduce;
-    function _getFirstChild(parent: TTreeNode): Boolean;
-    function _getSiblings(node: TTreeNode): Boolean;
-  public
-    property Tree: TTreeView write SetTree;
-    constructor Create(owner: TComponent); reintroduce;
-  end;
 
     { TV }
 
   TV = class(TForm)
-				ActGetFile: TAction;
-				ActLoadSelection: TAction;
-				ActLoadWords: TAction;
+		ActGetFile: TAction;
+		ActBldSubTrees : TAction;
+		ActCmpWords_W_Db : TAction;
+		ActLoadSelection: TAction;
+		ActLoadWords: TAction;
+		BtnBuildTree : TBitBtn;
     btmPanelTab2: TPanel;
-		Label2: TLabel;
-		lblDatabaseName: TLabel;
-		mmoWords: TMemo;
+		btnCalcCombPerm : TButton;
+		capCombinationCount : TLabel;
+		imgList : TImageList;
+		cap_output_grid : TLabel;
+		cap_words_memo : TLabel;
+		lblCombinationCount : TLabel;
+		capPermutationCount : TLabel;
+		lblPermutationCount : TLabel;
+		lblSetSize : TLabel;
+		lblTakeAt : TLabel;
+		edSetSize : TMaskEdit;
+		edTakenAt : TMaskEdit;
+		MenuItem1 : TMenuItem;
+		mmoWords : TMemo;
+		mnuItm_bld_tree : TMenuItem;
+		mnuItm_ps_word_list : TMenuItem;
+		mnuItm_ps_the_tree : TMenuItem;
+		mnuItm_bld_sub_trees : TMenuItem;
+		MenuItem6 : TMenuItem;
+		N5 : TMenuItem;
+		N4 : TMenuItem;
+		N3 : TMenuItem;
+		N2 : TMenuItem;
+		pnl_for_words_memo : TPanel;
+		pnl_for_output_grid : TPanel;
+		pgCtrl_ex : TPageControl;
 		Panel1: TPanel;
-		pnlDbOpsFiller: TPanel;
-    Splitter1: TSplitter;
+		pnlTvuTop : TPanel;
+		pnlTvu : TPanel;
+		pnlTesting : TPanel;
+		pnlTvuTop1 : TPanel;
+		Popup : TPopupMenu;
+		sGrid : TStringGrid;
     capIterator: TLabel;
     lblIteratorI: TLabel;
     capLvl: TLabel;
@@ -50,25 +65,32 @@ type
     capRootChar: TLabel;
     lblRootChar: TLabel;
     pgBar: TProgressBar;
-		Splitter2: TSplitter;
+		spltr_4_tvu: TSplitter;
 		Splitter3: TSplitter;
-		SQLQuery1: TSQLQuery;
-		tabDbOps: TTabSheet;
+		toolBar_main : TToolBar;
+		tb_build_tree : TToolButton;
+		tb_ps_sub_trees : TToolButton;
+		ToolButton1 : TToolButton;
+		ToolButton2 : TToolButton;
+		ToolButton3 : TToolButton;
+		tb_ps_tree : TToolButton;
+		ToolButton5 : TToolButton;
+		tsFor3s : TTabSheet;
+		tsDbOps: TTabSheet;
+		tsTesting : TTabSheet;
     topPanelTab2: TPanel;
     edCharString: TEdit;
-    BtnBuildTree: TButton;
     pgCtrl: TPageControl;
-    tabSheetMain: TTabSheet;
+    tsMain: TTabSheet;
     lblTvuItemCount: TLabel;
     edTvuItmCount: TEdit;
     capMaxCount: TLabel;
     edMaxCount: TEdit;
-    tvu: TTreeView;
     ActLst4WordScapes: TActionList;
     ActBldTree: TAction;
-    ActPsWordList: TAction;
+    ActBuildWordList: TAction;
     lblFinalCount: TLabel;
-    Label1: TLabel;
+    cap_enterLetters: TLabel;
     ActEnableMnMnu: TAction;
     mnMnu: TMainMenu;
     File1: TMenuItem;
@@ -78,45 +100,61 @@ type
     mnuPsOptions: TMenuItem;
     Buildtree1: TMenuItem;
     Processwordlist1: TMenuItem;
-    btnPsWordList: TButton;
-		procedure ActLoadSelectionExecute(Sender: TObject);
-  procedure ActLoadWordsExecute(Sender: TObject);
+		tvu : TTreeView;
+		MainPropStorage : TXMLPropStorage;
+		procedure ActBldSubTreesExecute(Sender : TObject);
+  procedure ActLoadSelectionExecute(Sender: TObject);
+    procedure ActLoadWordsExecute(Sender: TObject);
+		procedure ActCmpWords_W_DbExecute(Sender : TObject);
+		procedure btnCalcCombPermClick(Sender : TObject);
     procedure BtnCloseClick(Sender: TObject);
+		procedure MaskEditEnter(Sender : TObject);
 		procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-		procedure lblDatabaseNameClick(Sender: TObject);
     procedure tvuChange(Sender: TObject; Node: TTreeNode);
     procedure FormActivate(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure ActBldTreeExecute(Sender: TObject);
-    procedure ActPsWordListExecute(Sender: TObject);
+    procedure ActBuildWordListExecute(Sender: TObject);
     procedure Close1Click(Sender: TObject);
-    procedure FormShow(Sender: TObject);
     procedure actCloseExecute(Sender: TObject);
-    procedure edCharStringKeyDown(Sender: TObject; var Key: Word;
-      Shift: TShiftState);
+    procedure edCharStringKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
   private
 		FFileName: TFileName;
     FLst4Words : TStringList;
-		procedure ActGetFromDbExecute(Sender: TObject);
+		FTreeHeight : integer;
+		FTreeWidth : integer;
+    FTvuMaxLevels : Integer;
+    FStartString : String;
+    FAraOfTvu : array of TTreeView;
+
 		procedure ActWrtWords2WordscapeExecute(Sender: TObject);
-    procedure AddTheChildren(Str: string; lvl: Integer; ParmNode: TTreeNode);
+    procedure AddTheChildren(Str : string; lvl : Integer; ParmNode : TTreeNode);
+		procedure buildATree(tree : TTreeView; const toLevel : Integer);
+		procedure BuildCombinationTree(ltrCount : Integer);
 		function cleanWordsTable: Boolean;
-    function GetFactorial(num: Integer): Integer;
-    function CombinationCount(num: Integer): Integer;
     function AddThisLevelsChildren(_str: string; Parent: TTreeNode): TTreeNode;
+		function ExtractSubTree(toLevel : Integer) : TTreeView;
+		procedure freeFAraOfTvu;
 
 		function GetLmtClause: UTF8String;
+
+    {  function GetTreeHeight is a bit bizarre.  }
+		function GetTreeHeight : integer;
+		function GetTreeWidth : integer;
 		function ParseLmtClause(var startAt, howMany: Integer): Boolean;
 
-    function PermutationCount(const num_chars, num_diff_chars: Integer;
-					const use_3_chars: Boolean): Integer;
 		procedure SetLmtClause(AValue: UTF8String);
-		procedure OpenDbConnection;
+		procedure SetStartString(AValue : String);
+		procedure unset_actions_enabled;
     procedure UpdateProgressBar;
-    procedure AddPages;
     procedure FrmPsWordsFormClose(Sender: TObject);
   public
     property FLmtClause: UTF8String read GetLmtClause write SetLmtClause;
+
+    property TreeHeight : integer read GetTreeHeight write FTreeHeight;
+    property TreeWidth : integer read GetTreeWidth write FTreeWidth;
+    property StartString : String read FStartString write SetStartString;
+    //property MaxLevels: Integer read FMaxLevels write FMaxLevels;
   end;
 
 var
@@ -128,55 +166,13 @@ implementation
 
 var
   //globLevel: SmallInt;
-  MaxLevels: Integer;
+  i : Integer;
 
 const
   First = 1;
-  SQL_get_words_cnt = 'SET ' + #64 + 'cnt := 0';
-  SQL_get_words_W_count = 'select (%scnt := %scnt +1) RowNbr, word from words '
-    + 'CROSS JOIN (SELECT %scnt := 0) AS dummy  %s';
-  SQL_get_words = 'select word from words %s';
+  NEW_TREE_PREFIX = 'tvu_';
 
-{ TNodeWalker }
 
-procedure TNodeWalker.SetTree(const Value: TTreeView);
-begin
-
-end;
-
-destructor TNodeWalker.Destroy;
-begin
-
-end;
-
-function TNodeWalker._getFirstChild(parent: TTreeNode): Boolean;
-begin
-
-end;
-
-function TNodeWalker._getSiblings(node: TTreeNode): Boolean;
-begin
-
-end;
-
-constructor TNodeWalker.Create(owner: TComponent);
-begin
-
-end;
-
-function TV.CombinationCount(num: Integer): Integer;
-var
-  fctrl, i: Integer;
-begin
-  fctrl := 1;
-  i := num - 1;
-  while i > 0 do
-  begin
-    fctrl := fctrl * num;
-    Inc(i, -1);
-  end;
-  Result := fctrl;
-end;
 
 procedure TV.edCharStringKeyDown(Sender: TObject; var Key: Word;
   Shift: TShiftState);
@@ -185,68 +181,16 @@ begin
     ActBldTree.Execute;
 end;
 
-function TV.PermutationCount(const num_chars, num_diff_chars: Integer;
-  const use_3_chars: Boolean): Integer;
-{
-  function TV.PermutationCount(const num_chars, num_diff_chars: Integer;
-  const use_3_chars : Boolean): Integer;
-  permutation count for 3 taken 3 at a time is 1.
-  --------------------- 3 taken 2 at a time is
-
-}
-var
-  iCnt: Integer;
-begin
-
-end;
 
 procedure TV.SetLmtClause(AValue: UTF8String);
 begin
   FLmtClause := AValue;
 end;
 
-procedure TV.OpenDbConnection;
+procedure TV.SetStartString(AValue : String);
 begin
-
-end;
-
-function TV.GetFactorial(num: Integer): Integer;
-var
-  fctrl: Integer;
-begin
-  fctrl := num;
-  num := num - 1;
-  while num > 1 do
-  begin
-    fctrl := fctrl * num;
-  end;
-  Result := fctrl;
-end;
-
-function CleanDuplicateChars(Str: string): string;
-var
-  rslt: string;
-  i: Integer;
-begin
-  rslt := '';
-  Str := AnsiUpperCase(Str);
-  for i := 1 to Length(Str) do
-    if (Str[i] >= 'A') and (Str[i] <= 'Z') and (not rslt.Contains(Str[i])) then
-      rslt := Concat(rslt, Str[i]);
-  Result := rslt;
-end;
-
-function CleanString(Str: string): string;
-var
-  rslt: string;
-  i: Integer;
-begin
-  rslt := '';
-  Str := AnsiUpperCase(Str);
-  for i := 1 to Length(Str) do
-    if (Str[i] >= 'A') and (Str[i] <= 'Z') then
-      rslt := Concat(rslt, Str[i]);
-  Result := rslt;
+  if FStartString = AValue then Exit;
+	FStartString := AValue;
 end;
 
 procedure TV.actCloseExecute(Sender: TObject);
@@ -254,59 +198,105 @@ begin
   Close;
 end;
 
+procedure TV.freeFAraOfTvu;
+var
+  i : Integer;
+begin
+  for i := 0 to Length(FAraOfTvu) -1 do
+    FAraOfTvu[i].Free;
+  SetLength(FAraOfTvu, 0);
+end;
+
 procedure TV.FrmPsWordsFormClose(Sender: TObject);
 begin
-  FrmPsWordsFile.Free;
+  FrmPsWords2DBController.Free;
+  freeFAraOfTvu;
 end;
 
-procedure TV.ActPsWordListExecute(Sender: TObject);
+procedure TV.ActBuildWordListExecute(Sender: TObject);
+(*   procedure TV.ActBuildWordListExecute
+*    not sure what this is???
+*)
 begin
-  if FrmPsWordsFile = nil then
-    FrmPsWordsFile := TFrmPsWords2DBController.Create(self);
-  FrmPsWordsFile.Position := poMainFormCenter;
-  FrmPsWordsFile.Show;
+  if FrmPsWords2DBController = nil then
+    FrmPsWords2DBController := TFrmPsWords2DBController.Create(self);
+  FrmPsWords2DBController.Position := poMainFormCenter;
+  FrmPsWords2DBController.Show;
 end;
 
-procedure TV.AddPages;
-var
-  i: Integer;
-  Str: string;
+procedure TV.unset_actions_enabled;
 begin
-  Str := edCharString.Text;
-  i := pgCtrl.PageCount - 1;
-  while i > 1 do
-  begin
-    pgCtrl.Pages[i].Free;
-    { TStringGrid and TPanel need to be freed }
-    Inc(i, -1);
-  end;
+  //tb_ps_tree.Enabled := False;
+  //tb_ps_sub_trees.Enabled := False;
 
+  ActBldTree.Enabled := True;
+  ActCmpWords_W_Db.Enabled := False;
+  ActBldSubTrees.Enabled := False;
 end;
 
 procedure TV.ActBldTreeExecute(Sender: TObject);
+(*  procedure TV.ActBldTreeExecute(Sender: TObject);
+    caller is TToolButton.tb_build_tree.
+    objective is to populate the tvu TTreeview (main)  *)
 var
-  i, lvl: Integer;
-  Str: string;
+  nodewalker : TNodeWalker;
+  _tree_height : Integer;
+  i : integer;
+begin
+  unset_actions_enabled;
+  FStartString := UpperCase(edCharString.Text);
+  buildATree(tvu, Length(FStartString));
+  ActBldSubTrees.Enabled := False;
+
+  {   FTreeHeight should be length of "cleaned" list of characters
+                                               entered by the user   }
+  _tree_height := Length(CleanDuplicateChars(FStartString));
+  i :=0;
+  exit;
+  nodewalker := TNodeWalker.Create(self, tvu, _tree_height, FTreeWidth);
+  try
+
+	finally
+    nodewalker.Free;
+	end;
+	//ActCmpWords_W_Db.Enabled := True;
+end;
+
+procedure TV.buildATree(tree : TTreeView; const toLevel : Integer);
+var
+  i, lvl : Integer;
+  maxLvls, ht, permCnt, combinationCnt,  takeAt : Integer;
+  cleanStr : String;
   Node, firstNode: TTreeNode;
 begin
-  AddPages;
-  edTvuItmCount.Text := '';
-  Str := CleanString(edCharString.Text);
-  if Length(Str) = 0 then
+  if toLevel = Length(FStartString) then
+  begin
+  	edTvuItmCount.Text := '';
+    cleanStr := CleanString(FStartString);
+    pnlTvuTop.Caption := Format('Start string is: %s', [FStartString]);
+	end
+  else   ;
+      // what if toLevel <> Length(FStartString)
+  cleanStr := CleanString(FStartString);
+  // this is not right. takeAt should be the length of the input string.
+  takeAt := Length(cleanStr);
+  if takeAt = 0 then
     Exit;
 
   pgBar.Min := 0;
   pgBar.Position := 0;
   pgBar.Visible := True;
 
-  tvu.Items.Clear;
+  tree.Items.Clear;
 
   try
     begin
-      { lst.Count factorial permutation count of the cnaracters of Str }
-      MaxLevels := Length(Str);
-      // pgBar.Max := CombinationCount(GetFactorial(MaxLevels), MaxLevels);
-      pgBar.Max := CombinationCount(MaxLevels);
+      { lst.Count factorial permutation count of the cnaracters of cleanStr.
+        I don't know what I meant here!!}
+      maxLvls := toLevel;
+      permCnt := PermutationCount(maxLvls, takeAt);
+      combinationCnt := CombinationCount(maxLvls, maxLvls);
+      pgBar.Max := permCnt;
       edMaxCount.Text := pgBar.Max.ToString;
       edMaxCount.Update;
 
@@ -315,40 +305,48 @@ begin
         the string. I.e., if the string is 'revenge', nodes are
         added to the root of 'r', 'e', 'v', 'e', 'n', 'g' and 'e'.
       }
-      firstNode := tvu.Items.AddFirst(nil, Str[1]);
-      { the first level does not have to have duplicate letters }
-      Str := CleanDuplicateChars(Str);
-      for i := 2 to Length(Str) do
+      firstNode := tree.Items.AddFirst(nil, cleanStr[1]);
+      { the first level does not need to have duplicate letters because
+        all the combinations}
+      cleanStr := CleanDuplicateChars(cleanStr);
+      ht := Length(cleanStr);
+      for i := 2 to ht do
       begin
-        tvu.Items.Add(firstNode, Str[i]);
+        tvu.Items.Add(firstNode, cleanStr[i]);
         { siblings of firstNode }
       end;
       { restore the string }
-      Str := CleanString(edCharString.Text);
-      { everything is good here }
+      cleanStr := CleanString(FStartString);
 
       try
-        tvu.Items.BeginUpdate;
-        Node := tvu.Items.GetFirstNode;
+        tree.Items.BeginUpdate;
+        Node := tree.Items.GetFirstNode;
         lvl := 0;
         //globLevel := lvl;
         while Node <> nil do
         begin
           lblRootChar.Caption := Concat('---', Node.Text, '---');
-          // tvu.FullExpand;
-          // tvu.Items.BeginUpdate;
-          AddTheChildren(Str, lvl, Node);
+          // tree.FullExpand;
+          // tree.Items.BeginUpdate;
+          {   We are at level 0!!   }
+          FTreeWidth := Length(cleanStr);
+          AddTheChildren(cleanStr, 0, Node);
           Node := Node.getNextSibling;
         end;
       finally
-        tvu.FullExpand;
-        tvu.Select(firstNode);
+        tree.FullExpand;
+        tree.Select(firstNode);
         firstNode.MakeVisible;
-        tvu.Items.EndUpdate;
-        tvu.SetFocus;
-        edTvuItmCount.Text := tvu.Items.Count.ToString;
+        tree.Items.EndUpdate;
+
+        if toLevel = Length(FStartString) then
+		    begin
+		  	  pgCtrl.ActivePage := tsMain;
+          tree.SetFocus;
+          edTvuItmCount.Text := tree.Items.Count.ToString;
+          lblFinalCount.Caption := tree.Items.Count.ToString;
+        end;
         pgBar.Visible := False;
-        lblFinalCount.Caption := tvu.Items.Count.ToString;
       end;
     end;
   except
@@ -370,6 +368,7 @@ begin
   Result := Str;
 end;
 
+function TV.AddThisLevelsChildren(_str: string; Parent: TTreeNode): TTreeNode;
 {
   TFrmWordScapes.AddThisLevelsChildren
   parameters:
@@ -377,7 +376,6 @@ end;
   Parent is the parent node for the branch of the tree
   returns the first node added
 }
-function TV.AddThisLevelsChildren(_str: string; Parent: TTreeNode): TTreeNode;
 var
   FrstNode: TTreeNode;
 begin
@@ -393,9 +391,26 @@ begin
   Result := FrstNode;
 end;
 
-function TV.GetLmtClause: UTF8String;
+function TV.GetLmtClause : UTF8String;
 begin
   Result := FLmtClause;
+end;
+
+function TV.GetTreeHeight : integer;
+(*
+ * function TV.GetTreeHeight is a bit bizarre. It is clear what
+ * Length(CleanDuplicateChars(FStartString)) should return but the
+ * FTreeHeight is returned as something else altogether; appears to
+ * ALWAYS be 64, no matter the length of the characters input.
+ *)
+begin
+  //FTreeHeight := Length(CleanDuplicateChars(FStartString));
+end;
+
+function TV.GetTreeWidth : integer;
+begin
+  if tvu.Items.Count < 5 then Exit;
+  FTreeWidth := Length(FStartString);
 end;
 
 procedure TV.UpdateProgressBar;
@@ -409,7 +424,7 @@ end;
 {
   the lvl parameter is the level in the tree.
 }
-procedure TV.AddTheChildren(Str: string; lvl: Integer; ParmNode: TTreeNode);
+procedure TV.AddTheChildren(Str: string; lvl : Integer; ParmNode: TTreeNode);
 var
   a_node: TTreeNode;
 begin
@@ -418,9 +433,8 @@ begin
   Str := removeParmNodeTextChar(Str, ParmNode.Text[1]);
 
   Inc(lvl); { each call to AddTheChildren moves us down to another level }
-  //globLevel := lvl;
-  { but, we can only go to the max levels (the length of the original string }
-  if lvl > MaxLevels then
+  { but, we can only go to the max levels (the length of the original string) }
+  if (lvl > FTreeWidth) { or (lvl > howDeep)} then
     Exit;
 
   lblLvl.Caption := Concat('===', IntToStr(lvl), '===');
@@ -434,11 +448,6 @@ begin
 
   { add this level's children }
   a_node := AddThisLevelsChildren(Str, ParmNode);
-  { good to here }
-
-  { add the children for this first node. Add a_node's siblings' children
-    in the following step }
-  // AddTheChildren(Str, lvl, a_node);
 
   { Now make recursive calls for each of firstNode's siblings }
   while True do
@@ -456,15 +465,23 @@ begin
   Close;
 end;
 
+procedure TV.MaskEditEnter(Sender : TObject);
+begin
+  TMaskEdit(Sender).SelectAll;
+end;
+
 procedure TV.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+  i : Integer;
 begin
   if Assigned(FLst4Words) then
     FLst4Words.Free;
-end;
-
-procedure TV.lblDatabaseNameClick(Sender: TObject);
-begin
-
+  MainPropStorage.Save;
+  while Length(FAraOfTvu) > 0 do
+  begin
+    FAraOfTvu[Length(FAraOfTvu) -1].Free;
+    SetLength(FAraOfTvu, Length(FAraOfTvu) -2 );
+	end;
 end;
 
 procedure TV.Close1Click(Sender: TObject);
@@ -483,7 +500,7 @@ end;
 
 procedure TV.FormActivate(Sender: TObject);
 begin
-  edCharString.SetFocus;
+	//tb_build_tree.SetFocus;
 end;
 
 procedure TV.FormCreate(Sender: TObject);
@@ -492,11 +509,9 @@ begin
   SetWindowPos(self.Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NoMove or SWP_NoSize);
 {$ENDIF}
   Word_Dmod := TWord_Dmod.Create(self);
-end;
-
-procedure TV.FormShow(Sender: TObject);
-begin
-  // MnMnu := nil;
+  MainPropStorage.Restore;
+  SetLength(FAraOfTvu, 0);
+  unset_actions_enabled;
 end;
 
 function TV.ParseLmtClause(var startAt, howMany: Integer): Boolean;
@@ -550,79 +565,12 @@ begin
   Result := True;
 end;
 
-procedure TV.ActGetFromDbExecute(Sender: TObject);
-var
-  q: TSQLQuery;
-  i, segSize: Integer;
-  s: string;
-  tx : TSQLTransaction;
-begin
-  q := TSQLQuery.Create(self);
-  q.DataBase := Word_Dmod.OpenDbConnection(tx);
-  q.Transaction := tx;
 
-  lblDatabaseName.Caption := q.DataBase.Name;
-  try
-    q.SQL.Clear;
-    q.SQL.Add(SQL_get_words_cnt);
-    q.Prepare;
-
-    try
-      tx.StartTransaction;
-      q.ExecSQL;
-      tx.Commit;
-    except
-      on E: Exception do
-      begin
-        ShowMessage(Concat('ActGetFromDbExecute:', sLineBreak, E.Message));
-        tx.Rollback;
-        raise;
-      end;
-    end;
-
-    q.SQL.Clear;
-    s := Format(SQL_get_words, [FLmtClause]);
-    q.SQL.Add(s);
-    tx.StartTransaction;
-    try
-      q.Open;
-      if q.RecordCount = 0 then
-        Exit;
-      mmoWords.Lines.Clear;
-      pgBar.Min := 0;
-      pgBar.Max := q.RecordCount;
-      pgBar.Position := 0;
-      i := 0;
-      pgBar.Visible := True;
-      segSize := q.RecordCount div 100;
-      { divide up segments for the pgBar }
-      if segSize = 0 then
-        segSize := 1;
-
-      while not q.Eof do
-      begin
-        mmoWords.Lines.Add(q.Fields[0].AsString);
-        q.Next;
-        Inc(i);
-        if (i > 0) and (i mod segSize = 0) then
-          pgBar.Position := i;
-      end;
-    finally
-      tx.Rollback;
-      q.DataBase.Close(True);
-    end;
-  finally
-    q.Free;
-    pgBar.Visible := False;
-    q.DataBase.Close(True);
-  end;
-end;
-
-{
-  function TV.cleanWordsTable: boolean;
-  A DANGEROUS FUNCTION
-}
 function TV.cleanWordsTable: Boolean;
+(*
+  function TV.cleanWordsTable: boolean;
+  A DANGEROUS FUNCTION so I have it repeated in several units???
+ *)
 const
   SQL = 'delete from words';
 var
@@ -659,34 +607,105 @@ procedure TV.ActLoadSelectionExecute(Sender: TObject);
 var
   startsAt, howMany: Integer;
 begin
-  if FrmGetDbParamsDlg = nil then
-    FrmGetDbParamsDlg := TFrmGetDbParams.Create(self);
+  if not Assigned(FrmGetDbParams) then
+    FrmGetDbParams := TFrmGetDbParams.Create(self);
 
-  FrmGetDbParamsDlg.Position := poMainFormCenter;
-  FrmGetDbParamsDlg.ShowModal;
-  FLmtClause := FrmGetDbParamsDlg.FLmtClause;
+  FrmGetDbParams.Position := poMainFormCenter;
+  FrmGetDbParams.ShowModal;
+  FLmtClause := FrmGetDbParams.FLmtClause;
   ParseLmtClause(startsAt, howMany);
 end;
 
-procedure TV.ActLoadWordsExecute(Sender: TObject);
+procedure TV.BuildCombinationTree(ltrCount : Integer);
+(*  procedure TV.BuildCombinationTree
+ *  No idea what this is for???
+ *)
 var
-  strm: TFileStream;
+  ts : TTabSheet;
+  tree : TTreeView;
+begin
+  if ltrCount < 3 then Exit;
+
+  ts := TTabSheet.Create(pgCtrl_ex);
+  ts.PageControl := pgCtrl_ex;
+  ts.Caption := IntToStr(ltrCount) + 's';
+  tree := ExtractSubTree(ltrCount);
+  tree.Name := NEW_TREE_PREFIX + IntToStr(ltrCount);
+  tree.Parent := ts;
+  tree.Align := alClient;
+
+end;
+
+function TV.ExtractSubTree(toLevel : Integer) : TTreeView;
+var
+  newLen : Integer;
+  tv : TTreeView;
+begin
+  newLen := Length(FAraOfTvu) +1;
+  SetLength(FAraOfTvu, Length(FAraOfTvu) +1);
+  Dec(newLen);
+  FAraOfTvu[newLen] := TTreeView.Create(self);
+  tv := FAraOfTvu[newLen];
+  buildATree(tv, toLevel);
+  Result := tv;
+end;
+
+procedure TV.ActBldSubTreesExecute(Sender : TObject);
+var
+  i : Integer;
+begin
+  freeFAraOfTvu;
+  for i := 3 to FTreeWidth -1 do
+  begin
+    BuildCombinationTree(i);
+	end;
+  //bldTreeWords := TfmBldTreeWords.Create(self, tvu, ht, wd);
+end;
+
+procedure TV.ActLoadWordsExecute(Sender: TObject);
 begin
   ActLoadSelection.Execute;
   try
-    strm := TFileStream.Create(FileName, fmOpenRead or fmShareDenyNone);
-    try
-      if not Assigned(FLst4Words)
-        FLst4Words := TStringList.Create;
-      FLst4Words.LoadFromStream(strm);
-    finally
-      strm.Free;
-    end;
-    psTextFile(sLst4Words);
+    if not Assigned(FLst4Words) then
+      FLst4Words := TStringList.Create;
+    FLst4Words.LoadFromFile(FFileName);
+    //psTextFile(FLst4Words);
   except
     on E: Exception do
       ShowMessage(Concat('ActLoadWordsExecute: ', sLineBreak, E.Message));
   end;
+end;
+
+procedure TV.ActCmpWords_W_DbExecute(Sender : TObject);
+var
+  compWords_W_DB : TfmCompWords_W_DB;
+  cnt, wd, ht : Integer;
+begin
+  if tvu.Items.Count < 5 then
+    Exit;
+  //ht := TreeHeight;     // why does this get from 4 (the actual height) to 64
+  ht := FTreeHeight;
+  wd := TreeWidth;
+  compWords_W_DB := TfmCompWords_W_DB.Create(self, tvu, ht, wd);
+  try
+    mmoWords.Lines := compWords_W_DB.Out_list;
+    cnt := mmoWords.Lines.Count;
+    pgCtrl.ActivePage := tsDbOps;
+
+	finally
+    compWords_W_DB.Free;
+    ActBldSubTrees.Enabled := True;
+	end;
+end;
+
+procedure TV.btnCalcCombPermClick(Sender : TObject);
+var
+  num, takenAt : Integer;
+begin
+  num := StrToInt(Trim(edSetSize.Text));
+  takenAt := StrToInt(Trim(edTakenAt.Text));
+  lblCombinationCount.Caption := IntToStr(CombinationCount(num, takenAt));
+  lblPermutationCount.Caption := IntToStr(PermutationCount(num, takenAt));
 end;
 
 procedure TV.ActWrtWords2WordscapeExecute(Sender: TObject);
@@ -704,13 +723,13 @@ begin
   pgBar.Min := 0;
   pgBar.Max := FLst4Words.Count;
   rows2Ps := FLst4Words.Count;
-  lblRows2Ps.Caption := rows2Ps.ToString;
-  lblRows2Ps.Invalidate;
+  //lblRows2Ps.Caption := rows2Ps.ToString;
+  //lblRows2Ps.Invalidate;
   pgBar.Position := 0;
   startTime := Now;
 
-  Word_Dmod.DbConn.Trace();
-  qry := TSQLQuery.Create(self);   \
+  //Word_Dmod.DbConn.Trace();
+  qry := TSQLQuery.Create(self);
 
   i := 0;
 
@@ -719,18 +738,18 @@ begin
     qry.Transaction := tx;
     qry.SQL.Add(WORDS_INSERT_SQL);
 
-    qry.Params[0].DataType := ftString;
+    //qry.Params[0].DataType := ftString;
     qry.Prepare;
     pgBar.Visible := True;
     tx.StartTransaction;
     try
       while i < FLst4Words.Count - 1 do
       begin
-        if RegEx.IsMatch(FLst4Words.Strings[i]) then
-        begin
-          FLst4Words.Delete(i);
-          Continue;
-        end;
+        //if RegEx.IsMatch(FLst4Words.Strings[i]) then
+        //begin
+        //  FLst4Words.Delete(i);
+        //  Continue;
+        //end;
         {$DEFINE SEEWORDS}
         {$IFDEF SEEWORDS}
         mmoWords.Lines.Add(FLst4Words.Strings[i]);
@@ -751,12 +770,12 @@ begin
             pgBar.Position := i;
             pgBar.Repaint;
 
-            lblElapsedTime.Caption := SecondsBetween(Now, startTime).ToString;
-            lblElapsedTime.Repaint;
-            estimatedTimeOfCompletion(startTime, rows2Ps, i);
+            //lblElapsedTime.Caption := SecondsBetween(Now, startTime).ToString;
+            //lblElapsedTime.Repaint;
+            //estimatedTimeOfCompletion(startTime, rows2Ps, i);
           end;
-          lblCurRow.Caption := i.ToString;
-          lblCurRow.Repaint;
+          //lblCurRow.Caption := i.ToString;
+          //lblCurRow.Repaint;
         end;
 
         Inc(i);

@@ -1,9 +1,9 @@
-object FrmPsWordsFile: TFrmPsWordsFile
-  Left = 978
+object FrmPsWords2DBController: TFrmPsWords2DBController
+  Left = 994
   Height = 489
-  Top = 561
+  Top = 337
   Width = 635
-  Caption = 'FrmPsWordsFile'
+  Caption = 'FrmPsWords2DBController'
   ClientHeight = 469
   ClientWidth = 635
   Color = clBtnFace
@@ -299,7 +299,6 @@ object FrmPsWordsFile: TFrmPsWordsFile
     object ActOpnDb: TAction
       Caption = 'Open database'
       Enabled = False
-      OnExecute = ActOpnDbExecute
     end
     object ActWrtWords2Wordscape: TAction
       Caption = 'Write words to database'

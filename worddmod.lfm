@@ -1,73 +1,51 @@
 object Word_Dmod: TWord_Dmod
   OnCreate = DataModuleCreate
   OldCreateOrder = False
-  Height = 371
-  HorizontalOffset = 998
-  VerticalOffset = 551
-  Width = 448
-  object DbQuery: TSQLQuery
-    FieldDefs = <>
-    Params = <>
-    Macros = <>
-    Left = 10
-    Top = 10
-  end
-  object DbQuery1: TSQLQuery
-    FieldDefs = <>
-    SQL.Strings = (
-      '''insert into words (word) values (:word)'''
-      ''
-    )
-    Params = <>
-    Macros = <>
-    Left = 72
-    Top = 8
-  end
+  Height = 265
+  HorizontalOffset = 942
+  VerticalOffset = 269
+  Width = 352
   object DbTx: TSQLTransaction
     Active = False
-    Left = 56
-    Top = 96
-  end
-  object SQLScript: TSQLScript
-    AutoCommit = False
-    UseDollarString = False
-    Directives.Strings = (
-      'SET TERM'
-      'COMMIT WORK'
-      'COMMIT RETAIN'
-      'COMMIT'
-      '#IFDEF'
-      '#IFNDEF'
-      '#ELSE'
-      '#ENDIF'
-      '#DEFINE'
-      '#UNDEF'
-      '#UNDEFINE'
-    )
-    Terminator = ';'
-    CommentsinSQL = True
-    UseSetTerm = True
-    UseCommit = True
-    UseDefines = True
-    Left = 144
+    Left = 72
     Top = 24
   end
   object DbConn: TMySQL57Connection
-    Connected = False
+    Connected = True
     LoginPrompt = True
-    DatabaseName = 'WordScape'
+    DatabaseName = 'wordscape'
     KeepConnection = False
     Params.Strings = (
-      'Database=wordscape'
+      'Database=words'
       'DriverID=MySQL'
       'Password=j33ves99'
       'Server=s-notebook'
-      'User_Name=root'
-      'port=3305'
+      'User_Name=remote_user'
+      'Port=3305'
     )
+    Password = 'j33ves99'
+    UserName = 'root'
     HostName = 's-notebook'
     SkipLibraryVersionCheck = False
-    Left = 184
-    Top = 136
+    Left = 224
+    Top = 24
+  end
+  object qry: TSQLQuery
+    FieldDefs = <>
+    Database = DbConn
+    Transaction = DbTx
+    SQL.Strings = (
+      'CALL sp_GET_GOOD_WORDS(:PARAMS);'
+    )
+    Params = <    
+      item
+        DataType = ftString
+        Name = 'PARAMS'
+        ParamType = ptInput
+        Value = ' "''aah'',''aahed'',''aahing'',''aahs'',''aal'',''aalii'', ''sssssuuuu''"'
+      end>
+    Macros = <>
+    Left = 232
+    Top = 96
   end
 end

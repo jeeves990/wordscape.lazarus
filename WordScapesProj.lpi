@@ -64,7 +64,7 @@
       <Unit>
         <Filename Value="processwords2db_controller.pp"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="FrmPsWordsFile"/>
+        <ComponentName Value="FrmPsWords2DBController"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="ProcessWords2Db_controller"/>
@@ -90,12 +90,26 @@
         <IsPartOfProject Value="True"/>
         <HasResources Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="icons\frmcompword_w_db.pp"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="fmCompWords_W_DB"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="frmCompWord_W_DB"/>
+      </Unit>
+      <Unit>
+        <Filename Value="wordscapehelper.pp"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="WordscapeHelper"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <SearchPaths>
+      <OtherUnitFiles Value="icons"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Parsing>

@@ -101,7 +101,7 @@ type
   end;
 
 var
-  FrmPsWordsFile: TFrmPsWords2DBController;
+  FrmPsWords2DBController: TFrmPsWords2DBController;
 
 implementation
 

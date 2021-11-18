@@ -100,9 +100,8 @@ object FrmPsWordsFile: TFrmPsWordsFile
       Caption = 'Get words from database'
     end
   end
-  object OpnFlDlg: TFileOpenDialog
+  object OpnFlDlg: TOpenDialog
     DefaultExtension = 'txt'
-    FavoriteLinks = <>
     FileName = 'C:\Delphi Apps\WordScapes\words.txt'
     FileTypes = <>
     OkButtonLabel = 'Open file'
