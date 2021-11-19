@@ -91,7 +91,7 @@
         <HasResources Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="icons\frmcompword_w_db.pp"/>
+        <Filename Value="frmcompword_w_db.pp"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="fmCompWords_W_DB"/>
         <HasResources Value="True"/>
@@ -102,6 +102,11 @@
         <Filename Value="wordscapehelper.pp"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="WordscapeHelper"/>
+      </Unit>
+      <Unit>
+        <Filename Value="treenodewalker.pp"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="TreeNodeWalker"/>
       </Unit>
     </Units>
   </ProjectOptions>

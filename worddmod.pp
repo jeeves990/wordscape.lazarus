@@ -17,12 +17,12 @@ type
     DbConn: TMySQL57Connection;
     DbTx: TSQLTransaction;
 		qry : TSQLQuery;
-    procedure DataModuleCreate(Sender: TObject);
+    //procedure DataModuleCreate(Sender: TObject);
   private
 
   public
     function OpenDbConnection(out param_dbTx: TSQLTransaction): TMySQL57Connection;
-
+    constructor Create(Sender : TComponent);
   end;
 
 const
@@ -33,6 +33,7 @@ const
   COMMA = #44;
   SPACE = #32;
   DOUBLEQUOTE = '"';
+  NOTASSIGNED_INT = -9999999;
 
 var
   Word_Dmod: TWord_Dmod;
@@ -40,48 +41,6 @@ var
 implementation
 
 {$R *.lfm}
-
-procedure Button1Click(Sender: TObject);
-var
-  Texto: string;
-  Output: array [1..20] of byte;
-  i: integer;
-begin
-  //Hash := TDCP_sha1.Create(nil);
-  //Hash.Init;
-  //Hash.UpdateStr('j33ves99');
-  //
-  //
-  //Hash.Final(Output);
-  //Hash.Free;
-
-
-  Texto := '';
-  for i := 1 to 20 do
-    Texto := Texto + IntToHex(Output[i], 1);
-  ShowMessage(Texto);
-end;
-
-{ TWord_Dmod }
-
-procedure TWord_Dmod.DataModuleCreate(Sender: TObject);
-var
-  tx: TSQLTransaction;
-begin
-  try
-    try
-      OpenDbConnection(tx);
-      DbTx.DataBase := DbConn;
-      DbTx.StartTransaction;
-      DbTx.Rollback;
-    except
-      on e: Exception do
-        ShowMessage(e.Message);
-    end;
-  finally
-    DbConn.Close(True);
-  end;
-end;
 
 function TWord_Dmod.OpenDbConnection(
   out param_dbTx: TSQLTransaction): TMySQL57Connection;
@@ -95,6 +54,16 @@ begin
     param_dbTx := DbTx;
     Result := DbConn;
   end;
+end;
+
+constructor TWord_Dmod.Create(Sender : TComponent);
+begin
+  try
+    inherited Create(Sender);
+    //ShowMessage(Sender.ClassName);
+	except  on E: Exception do
+    ShowMessage(Concat('TWord_Dmod.Create: ', E.Message));
+	end;
 end;
 
 end.
