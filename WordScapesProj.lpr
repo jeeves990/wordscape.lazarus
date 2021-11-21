@@ -1,6 +1,7 @@
 program WordScapesProj;
 
 {$MODE Delphi}
+{$H+}
 
 uses
   Interfaces, // this includes the LCL widgetset

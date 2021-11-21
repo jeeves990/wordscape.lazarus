@@ -63,7 +63,7 @@ implementation
 
 {$R *.lfm}
 
-uses Words;
+//uses Words;
 
 procedure TFrmGetDbParams.SetLmtClause(Value: string);
 begin

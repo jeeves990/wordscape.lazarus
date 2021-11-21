@@ -7,6 +7,7 @@ object Word_Dmod: TWord_Dmod
   Width = 352
   object DbTx: TSQLTransaction
     Active = False
+    Database = DbConn
     Left = 72
     Top = 24
   end
@@ -21,11 +22,12 @@ object Word_Dmod: TWord_Dmod
       'Password=j33ves99'
       'Server=s-notebook'
       'User_Name=remote_user'
-      'Port=3305'
+      'Port=3306'
     )
     Password = 'j33ves99'
+    Transaction = DbTx
     UserName = 'root'
-    HostName = 's-notebook'
+    HostName = 'localhost'
     SkipLibraryVersionCheck = False
     Left = 224
     Top = 24
@@ -35,14 +37,19 @@ object Word_Dmod: TWord_Dmod
     Database = DbConn
     Transaction = DbTx
     SQL.Strings = (
-      'CALL sp_GET_GOOD_WORDS(:PARAMS);'
+      'CALL hello_world(:PARAMS);'
     )
     Params = <    
       item
         DataType = ftString
-        Name = 'PARAMS'
+        Name = 'aList'
         ParamType = ptInput
         Value = ' "''aah'',''aahed'',''aahing'',''aahs'',''aal'',''aalii'', ''sssssuuuu''"'
+      end    
+      item
+        DataType = ftString
+        Name = 'outList'
+        ParamType = ptOutput
       end>
     Macros = <>
     Left = 232

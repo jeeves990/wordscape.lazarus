@@ -1,12 +1,12 @@
 unit frmCompWord_W_DB;
 
 {$mode delphi}
-
+//{$DEFINE DEBUG}
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs,
-  fgl, SQLDB, WordDmod, ComCtrls, Contnrs;
+  Classes, SysUtils, Messages, Forms, Controls, Graphics, Dialogs,
+  fgl, SQLDB, WordDmod, ComCtrls, Contnrs, LMessages, LCLIntf;
 
 type
 
@@ -15,92 +15,55 @@ type
   TNodeWalker = class(TTreeView)
   private
 		FOutList : TStringList;
-		FCandidateList : TStringList;    // FPrepList is what is compared to database
+		FCandidateList : TStringList; // FCandidateList is compared to database
     FTree: TTreeView;
     FTreeHeight, FTreeWidth : Integer;
+    FRecurseCount : Integer;
+    FPassCount : Integer;
+    FGet3LetterWords : Boolean;
+		FParentHandle : UInt64;
 
-		function GetFromDb : TStringList;
+		procedure build_candidate_list(leafList : TObjectList);
+  function GetFromDb : TStringList;
 		function GetLimitClause : String;
     function get_top_level_node_into_array: Integer;
-    // Deprecated: procedure walkParentSubTree(_node : TTreeNode; const howWide : Integer);
 
     procedure SetTree(const Value: TTreeView);
     procedure processTree;
-		function walkParent_the_Tree(parent_node : TTreeNode;
-                                         lvl : Integer = 0): Integer;
+		function get_the_leaves(parent_node : TTreeNode;
+                               leafList : TObjectList;
+                                    lvl : Integer = 0): Integer;
   public
     FParentNodeAra : array of TTreeNode;
     FLimitClause : String;
+    FWork_str : String;
+
     property LimitClause : String read FLimitClause write FLimitClause;
     property Tree: TTreeView write SetTree;
     constructor Create(const aOwner: TComponent; tvu : TTreeView;
-                        const height, width : Integer);
+              const height, width : Integer;
+              const get_3_ltr_words : Boolean);
     destructor Destroy; override;
     property OutList : TStringList read FOutList;
     property PrepList : TStringList read FCandidateList;
     property TreeWidth : Integer read FTreeWidth write FTreeWidth;
     property TreeHeight : Integer read FTreeHeight write FTreeHeight;
-  end;
-
-  { TfmCompWords_W_DB }
-
-  TfmCompWords_W_DB = class(TForm)
-  private
-    FWalker : TNodeWalker;
-    FTreeHeight : Integer;
-    FTreeWidth : Integer;
-    FOut_list : TStringList;
-  public
-    constructor Create(const aOwner : TComponent; tvu : TTreeView;
-                        const height, width : Integer); reintroduce;
-    property Out_list : TStringList read FOut_list;
-    destructor Destroy; override;
+    property CandidateList : TStringList read FCandidateList
+                                        write FCandidateList;
+    property ParentHandle : UInt64 read FParentHandle write FParentHandle;
+  var
+    Callback : TCallbackMethod;
   end;
 
 var
-  fmCompWords_W_DB : TfmCompWords_W_DB;
+  {$IFDEF DEBUG}
+  _fl_ : TextFile;
+  {$ENDIF}
+  dummy : Boolean = True;
 
 implementation
 
 {$R *.lfm}
-
-var
-  tst_file : TextFile;
-  tst_file_name : String;
-
-function build_tst_file_name : String;
-var
-  dt : String;
-begin
-  dt := DateTimeToStr(Now);
-  Result := dt + '--Test_file.txt';
-end;
-
-{ TfmCompWords_W_DB }
-
-constructor TfmCompWords_W_DB.Create(const aOwner : TComponent; tvu : TTreeView;
-			const height, width : Integer);
-{
-    this is good for the initial tree, i.e., presume 'ROSES', height would
-    be 4 ('ROSE', since duplicate chars are dropped) and width would be 5.
-    Now, how do we handle the same presumed starting string but for
-    combination of 3 and 4?
-    Try: passing in the new treeview's, first of height = 4 and width = 3.
-        Then, another treeview of height = 4 and width = 4.
-}
-begin
-  inherited Create(aOwner);
-  FTreeHeight := height;
-  FTreeWidth := width;
-  FWalker := TNodeWalker.Create(self, tvu, FTreeWidth, FTreeHeight);
-  FOut_list := FWalker.FOutList;
-end;
-
-destructor TfmCompWords_W_DB.Destroy;
-begin
-  FWalker.Free;
-	inherited Destroy;
-end;
 
 { TNodeWalker }
 
@@ -130,6 +93,9 @@ function TNodeWalker.GetFromDb : TStringList;
     _ln := FTreeWidth;
     begin
       result_str := '';
+      _ln := FCandidateList.Count;
+      if FCandidateList.Count = 0 then
+        raise Exception.Create('GetFromDb: Candidate list is not built');
       while (FCandidateList.Count > 0) and (Length(str) < 1000) do
       begin
         str := FCandidateList[0];
@@ -190,44 +156,20 @@ begin
   FTree := Value;
 end;
 
-procedure TNodeWalker.processTree;
-(*  function TNodeWalker.processTree
- *  this is the entry point, it is called from the constructor.
- *)
-var
-  idx, cnt, i : Integer;
-  lenList : Integer;
-begin
-  if FTree.Items.Count < 5 then
-    Exit;
-  cnt := get_top_level_node_into_array;
-  FCandidateList.Clear;
-  lenList := Length(FParentNodeAra);
-
-  for idx := 0 to Length(FParentNodeAra) -1 do
-  {  iterate over the parent/top level nodes with a recursive
-     process to get their sub tree values }
-  begin
-
-    walkParent_the_Tree(FParentNodeAra[idx]);
-
-	end;
-
-  FCandidateList.Sort;
-	lenList := FCandidateList.Count;
-  GetFromDb;     // database is called here to get the good words
-end;
-
 constructor TNodeWalker.Create(const aOwner : TComponent; tvu : TTreeView;
-			const height, width : Integer);
+			                  const height, width : Integer;
+                        const get_3_ltr_words : Boolean);
 begin
+  inherited Create(aOwner);
   FCandidateList := TStringList.Create;
   FOutList := TStringList.Create;
   FTree := tvu;
   FTreeHeight := height;
   FTreeWidth := width;
+  FGet3LetterWords := get_3_ltr_words;
   if FTree.Items.Count < 5 then
     ShowMessage('TNodeWalker.Create: empty tree?');
+  FParentHandle := Application.Handle;
   processTree;
 end;
 
@@ -263,26 +205,142 @@ begin
   Result := i;
 end;
 
-function TNodeWalker.walkParent_the_Tree(parent_node : TTreeNode;
-      lvl : Integer) : Integer;
+const
+  _write_ln = 'Level: %d Text:%s%s';
+
+procedure TNodeWalker.processTree;
+(*  function TNodeWalker.processTree
+ *  this is the entry point, it is called from the constructor.
+ *  It bundles the top-level nodes into an array using the
+ *  get_top_level_node_into_array method.
+ *  Thence, iterates over that array, calling the worker method:
+ *  get_the_leaves for each array node.
+ *)
 var
-  idx : Integer;
-  work_node : TTreeNode;
-  child_node_list : TObjectList;
+  idx, cnt, i : Integer;
+  lenList : Integer;
+  leaf_list : TObjectList;
+  msg : TMessage;
 begin
-  child_node_list := TObjectList.Create;
+  if FTree.Items.Count < 5 then
+    Exit;
+  cnt := get_top_level_node_into_array;
+  FCandidateList.Clear;
+  lenList := Length(FParentNodeAra);
+
+  FRecurseCount := 0;
+  leaf_list := TObjectList.Create();
+  try
+    for idx := 0 to Length(FParentNodeAra) -1 do
+    {  iterate over the parent/top level nodes with a recursive
+       process to get their sub tree values }
+    begin
+      FPassCount := 0;
+      get_the_leaves(FParentNodeAra[idx], leaf_list, 0);
+      Inc(FRecurseCount, FPassCount);
+		end;
+    lenList := leaf_list.Count;
+    build_candidate_list(leaf_list);
+    {  pass the leaf_list to the main window in WordScapes  }
+    msg.msg := LM_POP_RAW_WORDS;
+    msg.wParam := PtrUInt(leaf_list);
+    Callback(msg);
+    //SendMessage(Application.Handle, LM_POP_RAW_WORDS, PtrUInt(leaf_list), 0);
+	finally
+    leaf_list.Free;
+  end;
+end;
+
+function TNodeWalker.get_the_leaves(parent_node : TTreeNode;
+                                       leafList : TObjectList;
+                                            lvl : Integer) : Integer;
+(*   function TNodeWalker.get_the_leaves
+*    parameters: parent_node : TTreeNode;
+*                pOutStr : String;
+*                lvl : Integer;  -- this is the level in the tree
+*    objective: iterate over all the nodes at the current level.
+*               Then, to recurse for each of these up the tree to
+*               the leaves which will be placed in the FLeafList
+*               class variable.
+*)
+var
+  idx, ndx : Integer;
+  work_node, prev_node : TTreeNode;
+
+begin
+  Inc(FPassCount);
   Inc(lvl);
   try
     work_node := parent_node.GetFirstChild;
     while Assigned(work_node) do
     begin
-      child_node_list.Add(work_node);
-      walkParent_the_Tree(work_node, lvl);
-      work_node := parent_node.GetNextChild(work_node)
+      prev_node := work_node;
+      //get_one_pass(work_node);  // , pOutStr);
+      ndx := work_node.Index;
+      get_the_leaves(work_node, leafList, lvl);
+      work_node := parent_node.GetNextChild(work_node);
+      {  if work_node is nil, prev_node is the leaf. }
+      if (lvl = FTreeWidth -1) and (not Assigned(work_node)) then
+         leafList.Add(prev_node);
 		end;
+
+    {$ifdef debug}
+    WriteLn(_fl_, pOutStr);
+    {$endif}
 	finally
-    child_node_list.Free;
-    Result := lvl
+	end;
+end;
+
+procedure TNodeWalker.build_candidate_list(leafList : TObjectList);
+(*     procedure TNodeWalker.build_candidate_list
+*      using the parameter leadList, which contains pointers to the
+*      leaves of the main TTreeView, builds the candidate word list
+*      by taking the parent, grand-parent... of the leafList nodes.
+*      This is done for all candidate word lengths downto either 4,
+*      the default, or 3 if the "Get three letter words" check box
+*      on the main form is checked. For those string lengths less
+*      than the length of the input string, by limiting the
+*      parent, grand-parent... walk; this works because all possible
+*      permutations are in the tree.
+*)
+  function build_candidate(leaf : TTreeNode; word_len : Integer): String;
+  begin
+  Result := EmptyStr;
+  while Assigned(leaf) do
+    begin
+      Result := leaf.Text + Result;
+      if Length(Result) = word_len then
+         Break;
+      leaf := leaf.Parent;
+	  end;
+	end;
+
+var
+  lf_ndx, iwordLen, minWordLen,
+    len_ndx : Integer;
+  sCandidate : String;
+begin
+  minWordLen := 4;
+  if FGet3LetterWords then
+     minWordLen := 3;
+  iWordLen := FTreeWidth;
+  lf_ndx := 0;
+  len_ndx := FTreeWidth;    // len_ndx will be dec'd downto minWordLen
+  FCandidateList.Clear;
+  while lf_ndx < leafList.Count do
+  begin
+    while len_ndx >= minWordLen do
+		  begin
+		    sCandidate := build_candidate(TTreeNode(leafList[lf_ndx]), len_ndx);
+		    FCandidateList.Add(sCandidate);
+		    Inc(lf_ndx);
+        if lf_ndx = leafList.Count then
+           Break;      // the inner loop
+	    end;
+    if len_ndx = minWordLen then
+       Break;      // the outer loop
+    Dec(len_ndx);
+    lf_ndx := 0;
 	end;
 end;
 
@@ -290,87 +348,55 @@ end.
 
 
 
-//procedure TNodeWalker.walkParentSubTree(_node : TTreeNode;
-//                                  const howWide : Integer);
-//(**************** this is deprecated  ******************)
-//  function get_these_children(node : TTreeNode;
-//                                        const thisWide : Integer) : Integer;
-//  var
-//    work_node,          // node to work with
-//    lastSib,            // last sibling of param: node
-//    first_child_node : TTreeNode;  // 1st child of param: node
-//    next_sib_node : TTreeNode;
-//    cara : array of TTreeNode;     // candidate node array
-//    idx, i, child_out_str_length : Integer;
-//    child_out_str : String;
-//  begin
-//		Inc(Result);
-//
-//    { if there are no children, this is a leaf node }
-//    first_child_node := node.GetFirstChild;
-//    if not Assigned(first_child_node) then
-//      Exit;
-//
-//    { to test for being a leaf???  NOTE: first_child_node.GetLastSibling
-//      is NOT in the order of getting the candidate. }
-//    if not Assigned(first_child_node.GetLastSibling) then
-//      Exit;
-//    lastSib := first_child_node.GetLastSibling;
-//    if lastSib = first_child_node then  // if first = last, this is a leaf
-//      Exit;
-//
-//    SetLength(cara, MAX_NODE_ARA_LEN);    // get nodes at this level into cara
-//    cara[0] := first_child_node;
-//    idx := 1;
-//
-//    work_node := first_child_node.GetFirstChild;
-//
-//    {  beginning with param: node, the head of cara  }
-//    while Assigned(work_node) do
-//    begin
-//      cara[idx] := work_node;
-//      next_sib_node := first_child_node.GetNextChild(work_node);
-//      if not Assigned(next_sib_node) then
-//        Break;
-//      work_node := next_sib_node;
-//      Inc(idx);
-//		end;
-//
-//    SetLength(cara, idx +1);
-//    child_out_str := node.Text;
-//    {  THIS IS WHERE THE CANDIDATE STRINGS ARE CONCATENATED.  }
-//    for i := 0 to Length(cara) -1 do
-//		  child_out_str := Concat(child_out_str, cara[i].Text);
-//		      //child_out_str := child_out_str + cara[i].Text;
-//    child_out_str_length := Length(child_out_str);
-//
-//    { add candidate strings to FCandidateList, the list that is
-//      compared to the database for validity  }
-//    if FCandidateList.IndexOf(child_out_str) < 0 then
-//      FCandidateList.Add(child_out_str);
-//
-//
-//    // iteratively call get_these_children recursively to get children
-//    for idx := 0 to Length(cara) -1 do
-//    begin
-//      if not Assigned(cara[idx]) then
-//      begin
-//        ShowMessage(Format('cara[%d] is not valid', [idx]));
-//        Exit;
-//      end;
-//      get_these_children(cara[idx], thisWide);
-//		end;
-//	end;
-//
-//  { so, I've got all the nodes from the tree, what do I do with them? }
-//
-//begin
-//  //while True do
-//  begin
-//  	get_these_children(_node, howWide);
-//	end;
-//
-//end;
+{ TfmCompWords_W_DB }
 
+TfmCompWords_W_DB = class(TForm)
+private
+  FWalker : TNodeWalker;
+  FTreeHeight : Integer;
+  FTreeWidth : Integer;
+  FOut_list : TStringList;
+  FParentHandle : THandle;
+public
+  constructor Create(const aOwner : TComponent; tvu : TTreeView;
+                         const height, width : Integer;
+                          const get3LtrWords : Boolean;
+                               parent_handle : THandle); reintroduce;
+  property Out_list : TStringList read FOut_list;
+  destructor Destroy; override;
+  property ParentHandle : THandle read FParentHandle write FParentHandle;
+end;
+
+{ TfmCompWords_W_DB }
+
+constructor TfmCompWords_W_DB.Create(const aOwner : TComponent; tvu : TTreeView;
+			const height, width : Integer; const get3LtrWords : Boolean;
+      parent_handle : THandle);
+(*
+ *   //this is good for the initial tree, i.e., presume 'ROSES', height would
+ *   //be 4 ('ROSE', since duplicate chars are dropped) and width would be 5.
+ *   //Now, how do we handle the same presumed starting string but for
+ *   //combination of 3 and 4?
+ *
+ *   DONE: HANDLED IN build_candidate_list
+ *
+ *   //Try: passing in the new treeview's, first of height = 4 and width = 3.
+ *   //    Then, another treeview of height = 4 and width = 4.
+ *)
+begin
+  inherited Create(aOwner);
+  ;
+  FTreeHeight := height;
+  FTreeWidth := width;
+  FWalker := TNodeWalker.Create(self, tvu, FTreeWidth,
+                                                FTreeHeight, get3LtrWords);
+  FOut_list := FWalker.FOutList;
+end;
+
+destructor TfmCompWords_W_DB.Destroy;
+begin
+  FWalker.Free;
+	inherited Destroy;
+end;
 
 
