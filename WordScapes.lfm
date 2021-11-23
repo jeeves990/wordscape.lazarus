@@ -1,7 +1,7 @@
 object V: TV
-  Left = 784
+  Left = 1121
   Height = 578
-  Top = 151
+  Top = 184
   Width = 611
   Caption = 'WordScapes word list'
   ClientHeight = 558
@@ -627,7 +627,8 @@ object V: TV
       Left = 8
       Height = 17
       Top = 47
-      Width = 512
+      Width = 592
+      Anchors = [akLeft, akRight, akBottom]
       TabOrder = 0
       Visible = False
     end
@@ -712,10 +713,10 @@ object V: TV
     Height = 395
     Top = 90
     Width = 611
-    ActivePage = tsMain
+    ActivePage = tsDbOps
     Align = alClient
     PopupMenu = Popup
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 2
     object tsMain: TTabSheet
       Caption = 'Word Treeview'
@@ -744,7 +745,7 @@ object V: TV
           Align = alClient
           TabOrder = 0
         end
-        object pnlTvuTop1: TPanel
+        object pnl_words_grid: TPanel
           Left = 1
           Height = 24
           Top = 1
@@ -763,7 +764,7 @@ object V: TV
           Color = 15919329
           ColCount = 1
           FixedCols = 0
-          FixedRows = 0
+          Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goRangeSelect, goThumbTracking, goDblClickAutoSize, goSmoothScroll]
           RowCount = 1
           TabOrder = 2
         end
@@ -829,7 +830,7 @@ object V: TV
           Alignment = taCenter
           Caption = 'Output grid'
         end
-        object sGrid: TStringGrid
+        object sGrid_output: TStringGrid
           Left = 1
           Height = 354
           Top = 14
@@ -862,12 +863,15 @@ object V: TV
           Alignment = taCenter
           Caption = 'Words memo'
         end
-        object tvu_raw_words: TTreeView
+        object raw_words_mmo: TMemo
           Left = 1
           Height = 354
           Top = 14
           Width = 256
           Align = alClient
+          Lines.Strings = (
+            ''
+          )
           TabOrder = 0
         end
       end
@@ -1033,6 +1037,7 @@ object V: TV
       Hint = 'Process sub trees'
       Top = 2
       Action = ActBldSubTrees
+      Visible = False
     end
     object ToolButton1: TToolButton
       Left = 441
@@ -1136,10 +1141,14 @@ object V: TV
       OnExecute = ActionTestCalculateExecute
     end
     object ActNodeWalker: TAction
-      Category = 'Prep output'''
+      Category = 'Prep output'
       Caption = 'Node walker'
       ImageIndex = 12
       OnExecute = ActNodeWalkerExecute
+    end
+    object ActGetStarted: TAction
+      Category = 'Prep output'
+      Caption = 'ActGetStarted'
     end
   end
   object mnMnu: TMainMenu

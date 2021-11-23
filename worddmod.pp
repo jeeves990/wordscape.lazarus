@@ -7,29 +7,37 @@ interface
 
 uses
   Classes, SysUtils, SQLDB, PQConnection, odbcconn, Dialogs,
-  mysql57conn, mysql80conn, LMessages, LCLIntf, Messages;
+  mysql57conn, mysql80conn, LMessages, LCLIntf, Messages,
+  Grids, Contnrs;
 
 type
-
   EWordsDbException = class(Exception);
   TCallbackMethod = procedure(msg: TMessage) of object;
+  TObjectListCallbackMethod = procedure(lst: TObjectList) of object;
+  TStringListCallbackMethod = procedure(lst: TStringList) of object;
+  TStringCallbackMethod = procedure(str : String) of object;
+
   { TWord_Dmod }
 
   TWord_Dmod = class(TDataModule)
     DbConn: TMySQL57Connection;
     DbTx: TSQLTransaction;
-		qry : TSQLQuery;
+    qry: TSQLQuery;
     procedure DataModuleCreate(Sender: TObject);
   private
 
+  protected
   public
     function OpenDbConnection(out param_dbTx: TSQLTransaction): TMySQL57Connection;
 
   end;
 
+var
+  MainFormHandle: THandle;
 
 const
   WORDS_INSERT_SQL = 'insert into words (word) values (:word)';
+  WORD_SELECT_SQL = 'SELECT word FROM words WHERE word in (%s) ORDER BY word';
   LMT2_1000 = ' Limit 0,1000 ';
   LMTLOADALL = ' ';
   LMTSELECT = ' Limit %s, %s ';
@@ -38,33 +46,52 @@ const
   DOUBLEQUOTE = '"';
 
   LM_POP_RAW_WORDS = LM_USER + 1;
-  LM_GET_MAIN_WINDOW_HANDLE = LM_USER +2;
-  LM_TEST_THE_HANDLE = LM_USER +3;
+  LM_GET_MAIN_WINDOW_HANDLE = LM_USER + 2;
+  LM_TEST_THE_HANDLE = LM_USER + 3;
+
+  MAX_COL_VALUE_STR_LEN = 4800;
 
 var
   Word_Dmod: TWord_Dmod;
   {$IFDEF DEBUG}
-  test_file_name : TFileName;
+  test_file_name: TFileName;
+
   {$ENDIF}
 
-function multiple_chars(_s : String; multiplier : Integer): String;
+function multiple_chars(_s: string; multiplier: integer): string;
+procedure Clear_string_grid(sgrid : TStringGrid;
+                            col_count : integer = 1;
+                            row_count : integer = 1;
+                            fixed_col_count : integer = 1;
+                            fixed_row_count : integer = 1);
 
 implementation
 
 {$R *.lfm}
 
-function multiple_chars(_s : String; multiplier : Integer): String;
+function multiple_chars(_s: string; multiplier: integer): string;
 var
-  i : Integer;
+  i: integer;
 begin
   Result := EmptyStr;
   for i := 1 to multiplier do
-    Result := Result +_s;
+    Result := Result + _s;
 end;
 
-function build_tst_file_name : String;
+procedure Clear_string_grid(sgrid : TStringGrid;
+                        col_count : integer; row_count : integer;
+			fixed_col_count : integer; fixed_row_count : integer);
+begin
+  sgrid.Clear;
+  sgrid.ColCount := col_count;
+  sgrid.RowCount := row_count;
+  sgrid.FixedCols := fixed_col_count;
+  sgrid.FixedRows := fixed_row_count;
+end;
+
+function build_tst_file_name: string;
 var
-  dt, cwd : String;
+  dt, cwd: string;
 begin
   dt := FormatDateTime('YYYYMMDD-hh-nn', Now);
   cwd := GetCurrentDir;
@@ -105,8 +132,8 @@ begin
   end;
 end;
 
-function TWord_Dmod.OpenDbConnection(
-  out param_dbTx: TSQLTransaction): TMySQL57Connection;
+function TWord_Dmod.OpenDbConnection(out param_dbTx: TSQLTransaction):
+TMySQL57Connection;
 begin
   if not DbConn.Connected then
     DbConn.Open; // (connStr);
@@ -125,3 +152,11 @@ initialization
   {$ENDIF}
 
 end.
+
+
+
+
+
+
+
+

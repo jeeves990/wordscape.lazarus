@@ -41,15 +41,9 @@ object Word_Dmod: TWord_Dmod
     )
     Params = <    
       item
-        DataType = ftString
-        Name = 'aList'
+        DataType = ftUnknown
+        Name = 'PARAMS'
         ParamType = ptInput
-        Value = ' "''aah'',''aahed'',''aahing'',''aahs'',''aal'',''aalii'', ''sssssuuuu''"'
-      end    
-      item
-        DataType = ftString
-        Name = 'outList'
-        ParamType = ptOutput
       end>
     Macros = <>
     Left = 232
