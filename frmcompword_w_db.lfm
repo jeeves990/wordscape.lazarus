@@ -1,7 +1,7 @@
 object fmCompWords_W_DB: TfmCompWords_W_DB
-  Left = 1489
+  Left = 952
   Height = 240
-  Top = 185
+  Top = 84
   Width = 320
   Caption = 'Compare words from tree with database'
   LCLVersion = '2.2.0.1'

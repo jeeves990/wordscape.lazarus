@@ -1,10 +1,10 @@
 object V: TV
-  Left = 1121
-  Height = 578
-  Top = 184
+  Left = 1179
+  Height = 634
+  Top = 167
   Width = 611
   Caption = 'WordScapes word list'
-  ClientHeight = 558
+  ClientHeight = 614
   ClientWidth = 611
   Color = clBtnFace
   Font.Color = clWindowText
@@ -553,7 +553,7 @@ object V: TV
   object btmPanelTab2: TPanel
     Left = 0
     Height = 73
-    Top = 485
+    Top = 518
     Width = 611
     Align = alBottom
     BevelOuter = bvNone
@@ -710,7 +710,7 @@ object V: TV
   end
   object pgCtrl: TPageControl
     Left = 0
-    Height = 395
+    Height = 428
     Top = 90
     Width = 611
     ActivePage = tsDbOps
@@ -720,26 +720,26 @@ object V: TV
     TabOrder = 2
     object tsMain: TTabSheet
       Caption = 'Word Treeview'
-      ClientHeight = 369
+      ClientHeight = 402
       ClientWidth = 603
       object spltr_4_tvu: TSplitter
         Left = 306
-        Height = 369
+        Height = 402
         Top = 0
         Width = 5
       end
       object Panel1: TPanel
         Left = 311
-        Height = 369
+        Height = 402
         Top = 0
         Width = 292
         Align = alClient
-        ClientHeight = 369
+        ClientHeight = 402
         ClientWidth = 292
         TabOrder = 1
         object pgCtrl_ex: TPageControl
           Left = 1
-          Height = 343
+          Height = 376
           Top = 25
           Width = 290
           Align = alClient
@@ -756,7 +756,7 @@ object V: TV
         end
         object sgrid_raw_words: TStringGrid
           Left = 1
-          Height = 343
+          Height = 376
           Top = 25
           Width = 290
           Align = alClient
@@ -771,11 +771,11 @@ object V: TV
       end
       object pnlTvu: TPanel
         Left = 0
-        Height = 369
+        Height = 402
         Top = 0
         Width = 306
         Align = alLeft
-        ClientHeight = 369
+        ClientHeight = 402
         ClientWidth = 306
         TabOrder = 2
         object pnlTvuTop: TPanel
@@ -789,7 +789,7 @@ object V: TV
         end
         object tvu: TTreeView
           Left = 1
-          Height = 343
+          Height = 376
           Top = 25
           Width = 304
           Align = alClient
@@ -803,22 +803,22 @@ object V: TV
     end
     object tsDbOps: TTabSheet
       Caption = 'Database Operations'
-      ClientHeight = 369
+      ClientHeight = 402
       ClientWidth = 603
       object Splitter3: TSplitter
         Left = 258
-        Height = 369
+        Height = 402
         Top = 0
         Width = 5
       end
       object pnl_for_output_grid: TPanel
         Left = 263
-        Height = 369
+        Height = 402
         Top = 0
         Width = 340
         Align = alClient
         Caption = 'Panel_for_output_grid'
-        ClientHeight = 369
+        ClientHeight = 402
         ClientWidth = 340
         TabOrder = 1
         object cap_output_grid: TLabel
@@ -832,7 +832,7 @@ object V: TV
         end
         object sGrid_output: TStringGrid
           Left = 1
-          Height = 354
+          Height = 387
           Top = 14
           Width = 338
           Align = alClient
@@ -846,12 +846,12 @@ object V: TV
       end
       object pnl_for_words_memo: TPanel
         Left = 0
-        Height = 369
+        Height = 402
         Top = 0
         Width = 258
         Align = alLeft
         Caption = 'Panel for words memo'
-        ClientHeight = 369
+        ClientHeight = 402
         ClientWidth = 258
         TabOrder = 2
         object cap_words_memo: TLabel
@@ -865,7 +865,7 @@ object V: TV
         end
         object raw_words_mmo: TMemo
           Left = 1
-          Height = 354
+          Height = 387
           Top = 14
           Width = 256
           Align = alClient
@@ -878,7 +878,7 @@ object V: TV
     end
     object tsTesting: TTabSheet
       Caption = 'Testing'
-      ClientHeight = 369
+      ClientHeight = 402
       ClientWidth = 603
       TabVisible = False
       object pnlTesting: TPanel
@@ -1087,6 +1087,13 @@ object V: TV
     Top = 72
     Width = 43
     Caption = 'Taken At'
+  end
+  object statusBar: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 591
+    Width = 611
+    Panels = <>
   end
   object ActLst4WordScapes: TActionList
     Images = imgList

@@ -6,9 +6,10 @@ interface
 
 uses
   Classes, SysUtils, Messages, Forms, Controls, Graphics, Dialogs,
-  fgl, SQLDB, WordDmod, ComCtrls, Contnrs, LMessages, LCLIntf;
+  fgl, SQLDB, WordDmod, ComCtrls, Contnrs, LMessages, LCLIntf, ExtCtrls;
 
 type
+
 
   { TNodeWalker }
 
@@ -27,11 +28,12 @@ type
     function GetFromDb: TStringList;
     function GetLimitClause: string;
     function get_top_level_node_into_array: integer;
+		procedure Timer_timeout(Sender : TObject);
 
     procedure SetTree(const Value: TTreeView);
     procedure processTree;
-    function get_the_leaves(parent_node: TTreeNode; leafList: TObjectList;
-      lvl: integer = 0): integer;
+    procedure get_the_leaves(parent_node: TTreeNode; leafList: TObjectList;
+      lvl: integer = 0);
   public
     FParentNodeAra: array of TTreeNode;
     FLimitClause: string;
@@ -55,7 +57,11 @@ type
     property ParentHandle: uint64 read FParentHandle write FParentHandle;
   var
     ObjectListCallback: TObjectListCallbackMethod;
+    LeafListCallback: TObjectListCallbackMethod;
     StringListCallback: TStringListCallbackMethod;
+    PgBarCallback : TPgBarCallbackMethod;
+    CursorCallback : TIntegerCallbackMethod;
+    StatusBarCallback : TStringCallbackMethod;
   end;
 
 var
@@ -75,6 +81,13 @@ const
   SQL_get_words_W_count = 'select (%scnt := %scnt +1) RowNbr, word from words ' +
     'CROSS JOIN (SELECT %scnt := 0) AS dummy  %s';
   SQL_get_words = 'select word from words %s';
+
+{ TfmCompWords_W_DB }
+
+procedure TNodeWalker.Timer_timeout(Sender : TObject);
+begin
+  PgBarCallback(0,0, MAXINT);
+end;
 
 function TNodeWalker.GetFromDb: TStringList;
 {
@@ -164,6 +177,8 @@ begin
   inherited Create(aOwner);
   FCandidateList := TStringList.Create;
   FFinalList := TStringList.Create;
+
+  //timer_timeout_callback := Timer_timeout;
 end;
 
 procedure TNodeWalker.setup_walker(tvu: TTreeView; const Height, Width: integer;
@@ -195,8 +210,7 @@ function TNodeWalker.get_top_level_node_into_array: integer;
  *  gets the top level nodes of the tree/tvu into an array    *)
 var
   i: integer;
-  Node, anode: TTreeNode;
-  s: string;
+  Node : TTreeNode;
 begin
   SetLength(FParentNodeAra, MAX_NODE_ARA_LEN);  // initialize the array
   i := 0;
@@ -204,7 +218,6 @@ begin
   while Assigned(Node) do
   begin
     FParentNodeAra[i] := Node;
-    s := Node.Text;
     Inc(i);
     Node := Node.getNextSibling;
   end;
@@ -228,7 +241,14 @@ var
   lenList, leaf_count: integer;
   leaf_list: TObjectList;
   msg: TMessage;
+  _cursor : TCursor;
+const
+  statBar_fmt_str = 'Processing %d element of top level node array';
 begin
+  _cursor := Cursor;
+  CursorCallback(crHourGlass);
+  StatusBarCallback('Just began processing final output');
+  Application.ProcessMessages;
   if FTree.Items.Count < 5 then
     Exit;
   cnt := get_top_level_node_into_array;
@@ -236,33 +256,38 @@ begin
   lenList := Length(FParentNodeAra);
 
   FRecurseCount := 0;
+  leaf_list := TobjectList.Create();
+  PgBarCallback(0, MAXINT, 0);
+
   try
-    leaf_list := TObjectList.Create()
-  except on Ex : Exception do
-    ShowMessage('TNodeWalker.processTree: leaf_list creation exception: '
-            + Ex.Message);
-	end;
-	try
-    for idx := 0 to Length(FParentNodeAra) - 1 do
+    while idx < Length(FParentNodeAra) do
     {  iterate over the parent/top level nodes with a recursive
        process to get their sub tree values }
     begin
+      PgBarCallback(idx, 0, 0);
+      StatusBarCallback(Format(statBar_fmt_str, [idx]));
       FPassCount := 0;
       get_the_leaves(FParentNodeAra[idx], leaf_list, 0);
+      {  TODO: this is the place to yield the leaf_list  }
+      //build_candidate_list(leaf_list);
       leaf_count := leaf_list.Count;
       Inc(FRecurseCount, FPassCount);
+      Inc(idx)
     end;
     lenList := leaf_list.Count;
     build_candidate_list(leaf_list);
-    {  pass the leaf_list to the main window in WordScapes  }
-    ObjectListCallback(leaf_list);  // this is a no op
   finally
-    FreeAndNil(leaf_list);
+    Inc(idx);
+    PgBarCallback(idx, 0, 0);
+    StatusBarCallback('Freeing heap memory. Get comfortable.');
+    leaf_list.Free;
+    CursorCallback(_cursor);
+    StatusBarCallback('');
   end;
 end;
 
-function TNodeWalker.get_the_leaves(parent_node: TTreeNode;
-  leafList: TObjectList; lvl: integer): integer;
+procedure TNodeWalker.get_the_leaves(parent_node: TTreeNode;
+  leafList: TObjectList; lvl: integer);
 (*   function TNodeWalker.get_the_leaves
 *    parameters: parent_node : TTreeNode;
 *                pOutStr : String;
@@ -273,7 +298,7 @@ function TNodeWalker.get_the_leaves(parent_node: TTreeNode;
 *               class variable.
 *)
 var
-  idx, ndx: integer;
+  idx : Integer;
   work_node, prev_node: TTreeNode;
 
 begin
@@ -284,8 +309,6 @@ begin
     while Assigned(work_node) do
     begin
       prev_node := work_node;
-      //get_one_pass(work_node);  // , pOutStr);
-      ndx := work_node.Index;
       get_the_leaves(work_node, leafList, lvl);
       work_node := parent_node.GetNextChild(work_node);
       {  if work_node is nil, prev_node is the leaf. }
@@ -359,51 +382,11 @@ begin
 end;
 
 end.
-{ TfmCompWords_W_DB }TfmCompWords_W_DB = class(TForm)
-private
-FWalker: TNodeWalker;
-FTreeHeight: integer;
-FTreeWidth: integer;
-FOut_list: TStringList;
-FParentHandle: THandle;
-public
-constructor Create(const aOwner: TComponent;
-tvu: TTreeView;
-const height, width: integer;
-const get3LtrWords: boolean;
-parent_handle: THandle);
-reintroduce;
-property Out_list: TStringList read FOut_list;
-destructor Destroy;
-override;
-property ParentHandle: THandle read FParentHandle write FParentHandle;
-end;
-{ TfmCompWords_W_DB }constructor TfmCompWords_W_DB.Create(const aOwner: TComponent;
-tvu: TTreeView;
-const height, width: integer;
-const get3LtrWords: boolean;
-parent_handle: THandle);
-(*
- *   //this is good for the initial tree, i.e., presume 'ROSES', height would
- *   //be 4 ('ROSE', since duplicate chars are dropped) and width would be 5.
- *   //Now, how do we handle the same presumed starting string but for
- *   //combination of 3 and 4?
- *
- *   DONE: HANDLED IN build_candidate_list
- *
- *   //Try: passing in the new treeview's, first of height = 4 and width = 3.
- *   //    Then, another treeview of height = 4 and width = 4.
- *)begin
-inherited Create(aOwner);
-;
-FTreeHeight := height;
-FTreeWidth := width;
-FWalker := TNodeWalker.Create(self, tvu, FTreeWidth,
-FTreeHeight, get3LtrWords);
-FOut_list := FWalker.FOutList;
-end;
-destructor TfmCompWords_W_DB.Destroy;
-begin
-FWalker.Free;
-inherited Destroy;
-end;
+
+
+
+
+
+
+
+

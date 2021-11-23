@@ -8,7 +8,7 @@ interface
 uses
   Classes, SysUtils, SQLDB, PQConnection, odbcconn, Dialogs,
   mysql57conn, mysql80conn, LMessages, LCLIntf, Messages,
-  Grids, Contnrs;
+  Grids, ExtCtrls, Contnrs;
 
 type
   EWordsDbException = class(Exception);
@@ -16,6 +16,10 @@ type
   TObjectListCallbackMethod = procedure(lst: TObjectList) of object;
   TStringListCallbackMethod = procedure(lst: TStringList) of object;
   TStringCallbackMethod = procedure(str : String) of object;
+  TPgBarCallbackMethod = procedure(arg : Integer; max : Integer;
+                          step : Integer) of object;
+  TTimerTimeoutMethod = procedure(Sender : TObject) of object;
+  TIntegerCallbackMethod = procedure(_int_ : Integer) of object;
 
   { TWord_Dmod }
 
@@ -23,21 +27,27 @@ type
     DbConn: TMySQL57Connection;
     DbTx: TSQLTransaction;
     qry: TSQLQuery;
+		Gen_timer : TTimer;
     procedure DataModuleCreate(Sender: TObject);
   private
 
   protected
   public
     function OpenDbConnection(out param_dbTx: TSQLTransaction): TMySQL57Connection;
-
+		procedure Gen_timer_OnTimer(Sender : TObject);
   end;
+
+	{ TMyObjList }
+
+  TMyObjList = class (TObjectList)
+    procedure Free; reintroduce;
+	end;
 
 var
   MainFormHandle: THandle;
 
 const
   WORDS_INSERT_SQL = 'insert into words (word) values (:word)';
-  WORD_SELECT_SQL = 'SELECT word FROM words WHERE word in (%s) ORDER BY word';
   LMT2_1000 = ' Limit 0,1000 ';
   LMTLOADALL = ' ';
   LMTSELECT = ' Limit %s, %s ';
@@ -111,6 +121,15 @@ begin
   ShowMessage(Texto);
 end;
 
+{ TMyObjList }
+
+procedure TMyObjList.Free;
+begin
+  while Count > 0 do
+    if self[0] <> nil then
+      self.Remove(self[0]);
+end;
+
 { TWord_Dmod }
 
 procedure TWord_Dmod.DataModuleCreate(Sender: TObject);
@@ -130,6 +149,11 @@ begin
   finally
     DbConn.Close(True);
   end;
+end;
+
+procedure TWord_Dmod.Gen_timer_OnTimer(Sender : TObject);
+begin
+
 end;
 
 function TWord_Dmod.OpenDbConnection(out param_dbTx: TSQLTransaction):
