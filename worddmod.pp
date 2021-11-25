@@ -7,17 +7,25 @@ interface
 
 uses
   Classes, SysUtils, SQLDB, PQConnection, odbcconn, Dialogs,
-  mysql57conn, mysql80conn, LMessages, LCLIntf, Messages,
+  mysql57conn, mysql80conn, LMessages, LCLIntf, Messages, fgl,
   Grids, ExtCtrls, Contnrs;
 
 type
+  { TPgBarOps }
+  TPgBarOps = record
+    arg, max, step : Integer;
+	end;
+
   EWordsDbException = class(Exception);
   TCallbackMethod = procedure(msg: TMessage) of object;
   TObjectListCallbackMethod = procedure(lst: TObjectList) of object;
   TStringListCallbackMethod = procedure(lst: TStringList) of object;
+  TStringStreamCallbackMethod = procedure(lst: TStringStream) of object;
+  TMemoryStreamCallbackMethod = procedure(strm: TMemoryStream) of object;
+
+  TFileStreamCallbackMethod = procedure(fl: TFileStream) of object;
   TStringCallbackMethod = procedure(str : String) of object;
-  TPgBarCallbackMethod = procedure(arg : Integer; max : Integer;
-                          step : Integer) of object;
+  TPgBarCallbackMethod = procedure(rec : TPgBarOps) of object;
   TTimerTimeoutMethod = procedure(Sender : TObject) of object;
   TIntegerCallbackMethod = procedure(_int_ : Integer) of object;
 
@@ -42,6 +50,27 @@ type
   TMyObjList = class (TObjectList)
     procedure Free; reintroduce;
 	end;
+
+  { TLeafList_file }
+  TLeafList_file = class(TFileStream)
+    FFileName : String;
+    FStr_len : Integer;
+    FDir : TFileName;
+
+    public
+      constructor Create(const str_len : Integer); reintroduce;
+      //function Read_next : String;
+      //procedure Write(const str : String);
+	end;
+
+  { TLeafList_file_list }
+  TLeafList_file_list = class(TObjectList)
+    public
+      constructor Create(file_count : Integer);
+	end;
+
+  //TTreeNodeList = specialize TFPGList<TTreenode>;
+  TTreeNodeList =  TFPGObjectList<TTreenode>;
 
 var
   MainFormHandle: THandle;
@@ -75,9 +104,21 @@ procedure Clear_string_grid(sgrid : TStringGrid;
                             fixed_col_count : integer = 1;
                             fixed_row_count : integer = 1);
 
+
+var
+  Temp_dir, Temp_file_name : AnsiString;
+
+procedure Get_temp_file_name;
+
 implementation
 
 {$R *.lfm}
+
+procedure Get_temp_file_name;
+begin
+  Temp_dir := GetTempDir;  // build a temporary directory private to me
+  Temp_file_name := GetTempFileName(Temp_dir, 'WordScape-');
+end;
 
 function multiple_chars(_s: string; multiplier: integer): string;
 var
@@ -119,6 +160,24 @@ begin
   for i := 1 to 20 do
     Texto := Texto + IntToHex(Output[i], 1);
   ShowMessage(Texto);
+
+end;
+
+{ TLeafList_file_list }
+
+constructor TLeafList_file_list.Create(file_count : Integer);
+var
+  i : Integer;
+  obj : TLeafList_file;
+begin
+  inherited Create(True);
+  i := 0;
+  while i < file_count do
+  begin
+    obj := TLeafList_file.Create(i +2);
+    self.Add(obj);
+    Inc(i)
+	end;
 end;
 
 { TMyObjList }
@@ -169,6 +228,18 @@ begin
     Result := DbConn;
   end;
 end;
+
+{ TLeafList_file }
+
+constructor TLeafList_file.Create(const str_len : Integer);
+begin
+  Get_temp_file_name;
+  FDir := Temp_dir;
+  FFileName := Temp_file_name;
+  inherited Create(FFileName, fmOpenReadWrite);
+end;
+
+
 
 initialization
   {$IFDEF DEBUG}
