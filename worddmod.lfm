@@ -2,57 +2,12 @@ object Word_Dmod: TWord_Dmod
   OnCreate = DataModuleCreate
   OldCreateOrder = False
   Height = 265
-  HorizontalOffset = 942
-  VerticalOffset = 269
+  HorizontalOffset = 1101
+  VerticalOffset = 412
   Width = 352
-  object DbTx: TSQLTransaction
-    Active = False
-    Database = DbConn
-    Left = 72
-    Top = 24
-  end
-  object DbConn: TMySQL57Connection
-    Connected = True
-    LoginPrompt = True
-    DatabaseName = 'wordscape'
-    KeepConnection = False
-    Params.Strings = (
-      'Database=words'
-      'DriverID=MySQL'
-      'Password=j33ves99'
-      'Server=s-notebook'
-      'User_Name=remote_user'
-      'Port=3306'
-    )
-    Password = 'j33ves99'
-    Transaction = DbTx
-    UserName = 'root'
-    HostName = 'localhost'
-    SkipLibraryVersionCheck = False
-    Left = 224
-    Top = 24
-  end
-  object qry: TSQLQuery
+  object WordBuffer: TBufDataset
     FieldDefs = <>
-    Database = DbConn
-    Transaction = DbTx
-    SQL.Strings = (
-      'CALL hello_world(:PARAMS);'
-    )
-    Params = <    
-      item
-        DataType = ftUnknown
-        Name = 'PARAMS'
-        ParamType = ptInput
-      end>
-    Macros = <>
-    Left = 232
-    Top = 96
-  end
-  object Gen_timer: TTimer
-    Enabled = False
-    Interval = 250
-    Left = 80
-    Top = 128
+    Left = 112
+    Top = 64
   end
 end

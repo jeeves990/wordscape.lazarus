@@ -1,7 +1,7 @@
 object V: TV
-  Left = 1179
+  Left = 1008
   Height = 634
-  Top = 167
+  Top = 240
   Width = 611
   Caption = 'WordScapes word list'
   ClientHeight = 614
@@ -864,7 +864,7 @@ object V: TV
           Alignment = taCenter
           Caption = 'Words memo'
         end
-        object raw_words_mmo: TMemo
+        object words_mmo: TMemo
           Left = 1
           Height = 387
           Top = 14

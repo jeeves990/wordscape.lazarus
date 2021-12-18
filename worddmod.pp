@@ -6,9 +6,9 @@ unit WordDmod;
 interface
 
 uses
-  Classes, SysUtils, SQLDB, PQConnection, odbcconn, Dialogs,
-  mysql57conn, mysql80conn, LMessages, LCLIntf, Messages, fgl,
-  Grids, ExtCtrls, Contnrs;
+  Classes, SysUtils, SQLDB, BufDataset, DB, memds, PQConnection, odbcconn,
+	Dialogs, mysql57conn, mysql80conn, LMessages, LCLIntf, Messages, fgl, Grids,
+	ExtCtrls, Contnrs;
 
 type
   { TPgBarOps }
@@ -28,21 +28,27 @@ type
   TPgBarCallbackMethod = procedure(rec : TPgBarOps) of object;
   TTimerTimeoutMethod = procedure(Sender : TObject) of object;
   TIntegerCallbackMethod = procedure(_int_ : Integer) of object;
+  TStatBarCallbackMethod = procedure(msg : String) of object;
 
+const
+  INIT_PGBAR = -1;
+  MARQUEE_PGBAR = 0;
+  STEP_PGBAR = 1;
+
+type
   { TWord_Dmod }
 
   TWord_Dmod = class(TDataModule)
-    DbConn: TMySQL57Connection;
-    DbTx: TSQLTransaction;
-    qry: TSQLQuery;
-		Gen_timer : TTimer;
+		WordBuffer : TBufDataset;
+		WordBufferid : TAutoIncField;
+		WordBufferword : TStringField;
     procedure DataModuleCreate(Sender: TObject);
-  private
 
-  protected
   public
-    function OpenDbConnection(out param_dbTx: TSQLTransaction): TMySQL57Connection;
-		procedure Gen_timer_OnTimer(Sender : TObject);
+    StatBarCallback : TStatBarCallbackMethod;
+    PgBarCallback : TPgBarCallbackMethod;
+
+    procedure Populate_mem_dataset(lst : TStrings);
   end;
 
 	{ TMyObjList }
@@ -69,9 +75,6 @@ type
       constructor Create(file_count : Integer);
 	end;
 
-  //TTreeNodeList = specialize TFPGList<TTreenode>;
-  TTreeNodeList =  TFPGObjectList<TTreenode>;
-
 var
   MainFormHandle: THandle;
 
@@ -88,7 +91,8 @@ const
   LM_GET_MAIN_WINDOW_HANDLE = LM_USER + 2;
   LM_TEST_THE_HANDLE = LM_USER + 3;
 
-  MAX_COL_VALUE_STR_LEN = 4800;
+  MAX_SQL_PARM_LEN = 4000;
+  ALPHA_CHARS = ['A'..'Z', 'a'..'z'];
 
 var
   Word_Dmod: TWord_Dmod;
@@ -107,6 +111,7 @@ procedure Clear_string_grid(sgrid : TStringGrid;
 
 var
   Temp_dir, Temp_file_name : AnsiString;
+  WordsFile : TFileName;
 
 procedure Get_temp_file_name;
 
@@ -192,41 +197,70 @@ end;
 { TWord_Dmod }
 
 procedure TWord_Dmod.DataModuleCreate(Sender: TObject);
+begin
+  StatBarCallback := nil;
+  PgBarCallback := nil;
+end;
+
+procedure TWord_Dmod.Populate_mem_dataset(lst : TStrings);
 var
-  tx: TSQLTransaction;
+  i : Integer;
+  pbRec : TPgBarOps;
 begin
+  i := 0;
   try
+    pbRec.arg := INIT_PGBAR;
+    pbRec.max := lst.Count -1;
+    pbRec.step := MAXINT;
+    PgBarCallback(pbRec);
+
+    //WordBuffer.FieldDefs.Add('id',ftInteger);
+    WordBuffer.FieldDefs.Add('word',ftString,45);
+    WordBuffer.CreateDataset;
+    WordBuffer.Open;
     try
-      OpenDbConnection(tx);
-      DbTx.DataBase := DbConn;
-      DbTx.StartTransaction;
-      DbTx.Rollback;
-    except
-      on e: Exception do
-        ShowMessage(e.Message);
-    end;
-  finally
-    DbConn.Close(True);
-  end;
+      while i < lst.Count  do
+      begin
+        if lst[i] = '' then
+          Continue;
+        if i mod 500 = 0 then
+        begin
+          if Assigned(PgBarCallback) then
+            begin
+              pbRec.arg := STEP_PGBAR;
+              PgBarCallback(pbRec);
+						end;
+					if Assigned(StatBarCallback) then
+            StatBarCallback(Format('Loading record #: %d', [i]));
+          //Application.ProcessMessages;
+				end;
+				WordBuffer.Append;
+        //WordBuffer.FieldByName('id').AsInteger := i + 1;
+        WordBuffer.FieldByName('word').AsString := lst[i];
+        WordBuffer.Post;
+        Inc(i);
+      end;
+      WordBuffer.SaveToFile('WordBuffer.txt');  // as long you do not close, you
+    except on Ex : Exception do
+      begin
+        ShowMessage(Format('LoadBufDataset exception at record %d.'
+                +LineEnding +#09 +'Exception %s',
+                [i, Ex.Message]));
+      end;
+
+		end;
+    WordBuffer.IndexDefs.Add('WordDx','word',[ixUnique,ixCaseInsensitive]);
+
+finally  if Assigned(PgBarCallback) then
+    begin
+      pbRec.arg := INIT_PGBAR;
+      pbRec.max := 0;
+      PgBarCallback(pbRec);
+		end;
+	if Assigned(StatBarCallback) then
+    StatBarCallback(Format('Loaded %d records', [i]));
 end;
 
-procedure TWord_Dmod.Gen_timer_OnTimer(Sender : TObject);
-begin
-
-end;
-
-function TWord_Dmod.OpenDbConnection(out param_dbTx: TSQLTransaction):
-TMySQL57Connection;
-begin
-  if not DbConn.Connected then
-    DbConn.Open; // (connStr);
-  if not DbConn.Connected then
-    raise EWordsDbException.Create('Database connection failed')
-  else
-  begin
-    param_dbTx := DbTx;
-    Result := DbConn;
-  end;
 end;
 
 { TLeafList_file }

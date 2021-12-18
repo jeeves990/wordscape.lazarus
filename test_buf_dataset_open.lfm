@@ -1,0 +1,175 @@
+object Test_bufDataset_open: TTest_bufDataset_open
+  Left = 447
+  Height = 451
+  Top = 123
+  Width = 689
+  Caption = 'Test_bufDataset_open'
+  ClientHeight = 451
+  ClientWidth = 689
+  PopupMenu = db_popup
+  LCLVersion = '2.2.0.1'
+  object pgCtrl: TPageControl
+    Left = 0
+    Height = 428
+    Top = 0
+    Width = 689
+    ActivePage = tb_dset
+    Align = alClient
+    PopupMenu = db_popup
+    TabIndex = 0
+    TabOrder = 0
+    object tb_dset: TTabSheet
+      Caption = 'DataSet'
+      ClientHeight = 400
+      ClientWidth = 681
+      object pnl_db_back: TPanel
+        Left = 0
+        Height = 400
+        Top = 0
+        Width = 681
+        Align = alClient
+        ClientHeight = 400
+        ClientWidth = 681
+        TabOrder = 0
+        object dbg: TDBGrid
+          Left = 1
+          Height = 378
+          Top = 1
+          Width = 598
+          Align = alClient
+          Color = clWindow
+          Columns = <          
+            item
+              Alignment = taRightJustify
+              Title.Caption = 'Internal Id'
+              FieldName = 'id'
+            end          
+            item
+              Title.Caption = 'Word'
+              Width = 150
+              FieldName = 'word'
+            end>
+          DataSource = dSrc
+          TabOrder = 0
+        end
+        object dbName: TDBNavigator
+          Left = 599
+          Height = 378
+          Top = 1
+          Width = 81
+          Align = alRight
+          BevelOuter = bvNone
+          ChildSizing.EnlargeHorizontal = crsScaleChilds
+          ChildSizing.EnlargeVertical = crsScaleChilds
+          ChildSizing.ShrinkHorizontal = crsScaleChilds
+          ChildSizing.ShrinkVertical = crsScaleChilds
+          ChildSizing.Layout = cclTopToBottomThenLeftToRight
+          ChildSizing.ControlsPerLine = 100
+          ClientHeight = 378
+          ClientWidth = 81
+          DataSource = dSrc
+          Direction = nbdVertical
+          Options = []
+          TabOrder = 1
+        end
+        object pgBar: TProgressBar
+          Left = 1
+          Height = 20
+          Top = 379
+          Width = 679
+          Align = alBottom
+          TabOrder = 2
+          Visible = False
+        end
+      end
+    end
+    object tb_mmo: TTabSheet
+      Caption = 'Memo'
+      ClientHeight = 400
+      ClientWidth = 681
+      object mmo: TMemo
+        Left = 0
+        Height = 400
+        Top = 0
+        Width = 681
+        Align = alClient
+        TabOrder = 0
+      end
+    end
+  end
+  object statBar: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 428
+    Width = 689
+    Panels = <>
+  end
+  object buf_dset: TBufDataset
+    MaxIndexesCount = 4
+    FieldDefs = <    
+      item
+        Name = 'id'
+        DataType = ftAutoInc
+      end    
+      item
+        Name = 'word'
+        DataType = ftString
+      end>
+    Left = 312
+    Top = 176
+    object buf_dsetid: TAutoIncField
+      DisplayLabel = 'Id'
+      FieldKind = fkData
+      FieldName = 'id'
+      Index = 0
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = True
+      Required = True
+    end
+    object buf_dsetword: TStringField
+      FieldKind = fkData
+      FieldName = 'word'
+      Index = 1
+      LookupCache = False
+      ProviderFlags = [pfInUpdate, pfInWhere]
+      ReadOnly = False
+      Required = True
+      Size = 0
+    end
+  end
+  object dSrc: TDataSource
+    DataSet = buf_dset
+    Left = 304
+    Top = 96
+  end
+  object Actions: TActionList
+    Left = 440
+    Top = 192
+    object ActionLoadMmo: TAction
+      Caption = 'Load memo'
+      OnExecute = ActionLoadMmoExecute
+    end
+    object ActionLoadBufDs: TAction
+      Caption = 'Load buffer dataset'
+      Enabled = False
+      OnExecute = ActionLoadBufDsExecute
+    end
+  end
+  object db_popup: TPopupMenu
+    Left = 144
+    Top = 136
+    object MenuItem1: TMenuItem
+      Action = ActionLoadMmo
+    end
+    object MenuItem2: TMenuItem
+      Action = ActionLoadBufDs
+    end
+  end
+  object MemDataset1: TMemDataset
+    FileName = 'D:\words.txt'
+    FieldDefs = <>
+    Left = 152
+    Top = 232
+  end
+end

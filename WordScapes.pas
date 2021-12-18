@@ -96,7 +96,7 @@ type
     pnl_words_grid: TPanel;
     Popup: TPopupMenu;
     Processwordlist1: TMenuItem;
-    raw_words_mmo: TMemo;
+    words_mmo: TMemo;
     sGrid_output: TStringGrid;
     sgrid_raw_words: TStringGrid;
     dbop_splitter: TSplitter;
@@ -152,13 +152,13 @@ type
     FNodeWalker_rowCount_array: array of integer;
 
     function AddThisLevelsChildren(_str: string; Parent: TTreeNode): TTreeNode;
+		procedure AfterCreate(ptr : IntPtr);
     procedure CursorFeedback(arg_cursor: integer);
     function ExtractSubTree(toLevel: integer): TTreeView;
-    procedure Final_output(slst: TStringList);
     function find_column_of_grid(_len: integer; grid: TStringGrid): integer;
     function GetLmtClause: utf8string;
     function GetTreeWidth: integer;
-    function Get_good_words_from_DB(const parm_str: string;
+    function Get_good_words_from_dataset(const parm_str: string;
       var slst: TStringList): boolean;
     function ParseLmtClause({var startAt, howMany: integer}): boolean;
 
@@ -452,8 +452,6 @@ begin
   i_row := 1;    // there is a fixed row
   try
     try
-    //while strm.Size > 0 do
-
       while str > '' do
       begin
         sgrid_raw_words.RowCount := sgrid_raw_words.RowCount +1;
@@ -513,62 +511,23 @@ begin
 	end;
 end;
 
-function TV.Get_good_words_from_DB(const parm_str: string;
-  var slst: TStringList): boolean;
+function TV.Get_good_words_from_dataset(const parm_str : string;
+			var slst : TStringList) : boolean;
 (*
  *    TV.Get_good_words_from_DB: passes parm_str to the database to discover
  *    the legitimate words in that parm_str. Those legitimate words are
  *    returned to the caller via the slst : TStringList parameter.
  *)
 var
-  qry: TSQLQuery;
-  tx: TSQLTransaction;
   sql: string;
-const
-  WORD_SELECT_SQL = 'SELECT word FROM words WHERE word in (%s) ORDER BY word';
+//const
+//  WORD_SELECT_SQL = 'SELECT word FROM words WHERE word in (%s) ORDER BY word';
 
 begin
   Result := False;
-  sql := Format(WORD_SELECT_SQL, [parm_str]);
-  qry := TSQLQuery.Create(self);
+  //sql := Format(WORD_SELECT_SQL, [parm_str]);
   try
-    qry.DataBase := Word_Dmod.OpenDbConnection(tx);
-    qry.SQL.Add(sql);
-    qry.UniDirectional := True;
-    qry.Prepare;
-    qry.Open;
-    while not qry.EOF do
-    begin
-      slst.Add(qry.FieldByName('word').AsString);
-    end;
-    Result := True;
   finally
-    qry.Free;
-  end;
-end;
-
-procedure TV.setup_pgBar(max: integer = 0);
-begin
-  pgBar.Min := 0;
-  pgBar.Max := max;
-  pgBar.Position := 0;
-  pgBar.Visible := True;
-  pgBar.Style := pbstNormal;
-end;
-
-procedure TV.Final_output(slst: TStringList);
-var
-  i, str_len: integer;
-begin
-  if slst.Count = 0 then
-    Exit;
-
-  str_len := Length(slst[0]);
-  sgrid_output.BeginUpdate;
-  try
-
-  finally
-    sgrid_output.EndUpdate(True);
   end;
 end;
 
@@ -849,7 +808,16 @@ begin
   //, SWP_NoMove);
   //or SWP_NoSize);
 {$ENDIF}
+  // set name of WordsFile
+  if FileExists(ParamStr(1)) then
+    WordsFile := ParamStr(1)
+  else
+    WordsFile := 'words.txt';
+
   Word_Dmod := TWord_Dmod.Create(self);
+  Word_Dmod.StatBarCallback := StatusBarFeedback;
+  Word_Dmod.PgBarCallback := PgBarFeedback;
+
   MainPropStorage.Restore;
   SetLength(FAraOfTvu, 0);
   set_actions(get_started);
@@ -863,6 +831,13 @@ begin
   FNodeWalker.PgBarCallback := TPgBarCallbackMethod(PgBarFeedback);
   FNodeWalker.CursorCallback := TIntegerCallbackMethod(CursorFeedback);
   FNodeWalker.StatusBarCallback := TStringCallbackMethod(StatusBarFeedback);
+  Application.QueueAsyncCall(AfterCreate, 0);
+end;
+
+procedure TV.AfterCreate(ptr : IntPtr);
+begin
+  words_mmo.Lines.LoadFromFile(WordsFile);
+  Word_dmod.Populate_mem_dataset(words_mmo.Lines);
 end;
 
 function TV.ParseLmtClause({var startAt, howMany: integer}): boolean;
@@ -998,29 +973,38 @@ begin
     IntToStr(PermutationCount_ex(num, takenAt, minLen));
 end;
 
+procedure TV.setup_pgBar(max: integer = 0);
+begin
+  pgBar.Min := 0;
+  pgBar.Max := max;
+  pgBar.Position := 0;
+  pgBar.Visible := True;
+  pgBar.Style := pbstNormal;
+end;
+
 procedure TV.PgBarFeedback(rec: TPgBarOps);
 {  procedure TV.PgBarFeedback(arg : Integer; _max : Integer = 0;
                                     step : Integer = 0);        }
-var
-  arg, _max, step: integer;
 begin
-  arg := rec.arg;
-  _max := rec.max;
-  step := rec.step;
-  if arg > 0 then
-    pgBar.Position := arg
+  if rec.arg > 0 then
+    pgBar.Position := rec.arg
   else
-  if arg = -1 then
-    setup_pgBar(_max)
-  else
-  if (arg = 0) and (_max = MAXINT) then
+  if rec.arg = INIT_PGBAR then
+    begin
+      if rec.max > 0 then
+        setup_pgBar(rec.max)
+      else
+        pgBar.Visible := False;
+		end
+	else
+  if (rec.arg = MARQUEE_PGBAR) and (rec.max = MAXINT) then
   begin
     pgBar.Style := pbstMarquee;
     pgBar.Visible := True;
     Application.ProcessMessages;
   end
   else
-  if step = MAXINT then
+  if (rec.arg = STEP_PGBAR) and (rec.step = MAXINT) then
     pgBar.StepIt;
 end;
 
@@ -1039,65 +1023,4 @@ begin
 end;
 
 end.
-procedure ActCmpWords_W_DbExecute(Sender: TObject);
-procedure TV.ActCmpWords_W_DbExecute(Sender: TObject);
-(*      { #todo : THIS IS NOT USED!!!???!! }
- *  TV.ActCmpWords_W_DbExecute
- *  The driver for
- *  1.  gathering raw words (from sgrid_raw_words) into suitable strings
- *      for a query where clause. (build_parm_str function)
- *  2.  call TV.Populate_output_grid which finishes the get good words process.
- *)const
-val_fmt = '"%s",';
-function build_parm_str(col: integer;
-sg: TStringGrid): string;
-var
-i: integer;
-msg: string;
-begin
-Result := EmptyStr;
-i := sg.FixedRows;
-if sg.RowCount < sg.FixedRows then
-begin
-msg := Format('TV.ActCmpWords_W_DbExecute: empty grid column %d',
-[col]);
-raise Exception.Create(msg);
-end;
-while True do    // i < sg.RowCount do  beginResult :=
-Result + Format(val_fmt, [sg.Cells[col, i]]);
-Inc(i);
-if (i = sg.RowCount)       // at the end of the column or(sg.Cells[col, i] = EmptyStr) then
-// out of populated cells  Break;// inner loop  end;if Length(Result) = 0 then
-raise Exception.Create('TV.ActCmpWords_W_DbExecute no parameters found.');
-if Result[Length(Result)] = COMMA then
-Result := Copy(Result, 0, Length(Result) -1);
-end;
-var
-i_col: integer;
-sg: TStringGrid;
-sl: TStringList;
-val_str: string;
-_cursor: TCursor;
-begin
-_cursor := Cursor;
-CursorFeedback(crHourGlass);
-val_str := EmptyStr;
-sg := sgrid_raw_words;
-pgCtrl.ActivePageIndex := 1;
-Application.ProcessMessages;
-sl := TStringList.Create;
-try
-i_col := sg.ColCount -1;
-while i_col > -1 do
-begin
-val_str := build_parm_str(i_col, sg);
-      {   val_str is a comma separated list of QuotedStr raw words.
-          Now, strain them out through the database.  }//Populate_output_grid(val_str);
-Application.ProcessMessages;
-Dec(i_col);
-end;
-//Populate_output_grid;    set_actions(compare_to_db);finally
-sl.Free;
-CursorFeedback(_cursor);
-end;
-end;
+

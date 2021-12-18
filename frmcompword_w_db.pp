@@ -27,17 +27,17 @@ type
     FGet3LetterWords: boolean;
     FParentHandle: uint64;
 
-    procedure build_candidate_list(leafList: TList);
+    function build_candidate_list(leafList : TObjectList) : TStringList;
     //procedure build_candidate_list(leafList: TObjectList);
-    function GetFromDb: TStringList;
+    function Get_goodWords_from_bufDset : TStringList;
     function GetLimitClause: string;
     function get_top_level_node_into_array: integer;
     procedure Timer_timeout(Sender: TObject);
 
     procedure SetTree(const Value: TTreeView);
     procedure processTree;
-    procedure get_the_leaves(parent_node: TTreeNode; leaf_list: TList;
-      lvl: integer = 0);
+    procedure get_the_leaves(parent_node : TTreeNode; leaf_list : TObjectList;
+					lvl : integer);
   public
     FParentNodeAra: array of TTreeNode;
     FLimitClause: string;
@@ -79,6 +79,8 @@ var
 
 implementation
 
+uses BufDataset, DB;
+
 {$R *.lfm}
 
 { TNodeWalker }
@@ -101,7 +103,7 @@ begin
   PgBarCallback(rec);
 end;
 
-function TNodeWalker.GetFromDb: TStringList;
+function TNodeWalker.Get_goodWords_from_bufDset : TStringList;
 {
     implemented as of 10/20/2021
     looks like getting words from database
@@ -111,116 +113,35 @@ function TNodeWalker.GetFromDb: TStringList;
     Then, need lists for all FTreeWidth character lengths
     and for, iteratively, Dec(FTreeWidth) down to character length
     of 3 combinations.
+
+    20211217: removing all the use of the database. Will be replaced
+    by TMemDataset.
+
+    The caller to this method builds the FCandidateStream; its nodes will
+    be tested agains the WordBuffer and the non-words will be added to
+    the stringlist.
 }
-var
-  word_param_array: array of string;
-
-
-  procedure prepareWordParam_Array;
-  var
-    str, result_str: string;
-    _ln: integer;
-
-    function drop_comma(str: string): string;
-    begin
-      if str.EndsWith(COMMA) then
-        Result := Copy(str, 1, Length(str) - 1)
-      else
-        Result := str;
-    end;
-
-  begin
-    str := '';
-    _ln := FTreeWidth;
-    begin
-      result_str := '';
-      _ln := FCandidateStream.Size;
-      if FCandidateStream.Size = 0 then
-        raise Exception.Create('GetFromDb: Candidate Stream is not built');
-
-      FCandidateStream.Seek(0, soBeginning);
-      str := FCandidateStream.ReadAnsiString;
-      while True do
-      begin
-        str := AnsiQuotedStr(str, DOUBLEQUOTE);
-        result_str += LowerCase(str) + COMMA;
-        _ln := Length(result_str);
-        if Length(result_str) > 4900 then
-        begin
-          SetLength(word_param_array, Length(word_param_array) + 1);
-          result_str := drop_comma(result_str);
-          word_param_array[Length(word_param_array) - 1] := result_str;
-          result_str := EmptyStr;
-        end;
-        if FCandidateStream.Position >= FCandidateStream.Size then
-          Break;
-        str := FCandidateStream.ReadAnsiString;
-      end;
-
-      if Length(result_str) > 0 then
-      begin
-        result_str := drop_comma(result_str);
-        SetLength(word_param_array, Length(word_param_array) + 1);
-        word_param_array[Length(word_param_array) - 1] := result_str;
-      end;
-
-    end;
-  end;
 
 var
-  q: TSQLQuery;
-  i, segSize: integer;
+  i: integer;
   str: ansistring;
-  tx: TSQLTransaction;
-  lst: TStringList;
+  word_buf : TBufDataset;
 begin
-  SetLength(word_param_array, 0);
-  prepareWordParam_Array;
-  //FCandidateList.Clear;
-  //FCandidateStream.Size := 0;
-  lst := TStringList.Create;
+  word_buf := Word_Dmod.WordBuffer;
+  Result := TStringList.Create;
 
-  q := TSQLQuery.Create(self);
-  q.DataBase := Word_Dmod.DbConn;
-  q.DataBase.Open;
+  if FCandidateStream.Size = 0 then
+    raise Exception.Create('Get_goodWords_from_bufDset: Candidate Stream is not built');
 
-  try
-    try
-      q.SQL.Text := 'CALL sp_GET_GOOD_WORDS(:PARAMWORDLIST)';
-      q.Prepare;
-
-      try
-
-        i := 0;
-        while i < Length(word_param_array) do
-        begin
-          q.ParamByName('PARAMWORDLIST').AsString := word_param_array[i];
-          q.Open;
-          q.First;
-          while not q.EOF do
-          begin
-            segSize := q.Fields.Count;
-            str := q.Fields[0].AsString;
-            lst.Add(str);
-            q.Next;
-          end;
-          Inc(i);
-        end;
-        if lst.Count > 0 then
-          FinalOutputCallback(lst);
-      finally
-        q.DataBase.Close(True);
-        q.Free;
-      end;
-    except
-      on Ex: Exception do
-      begin
-        ShowMessage(Format('TNodeWalker.GetFromDb exception: %s', [Ex.Message]));
-      end;
-    end;
-  finally
-    lst.Free;
-    SetLength(word_param_array, 0);
+  FCandidateStream.Seek(0, soBeginning);
+  str := FCandidateStream.ReadAnsiString;
+  while True do
+  begin
+    if word_buf.Locate('word', str, [loCaseInsensitive]) then
+      Result.Add(str);
+    if FCandidateStream.Position >= FCandidateStream.Size then
+      Break;
+    str := FCandidateStream.ReadAnsiString;
   end;
 end;
 
@@ -303,7 +224,7 @@ procedure TNodeWalker.processTree;
 var
   idx, cnt, i: integer;
   lenList, leaf_count: integer;
-  leaf_list: TList;
+  leaf_list: TObjectList;
   msg: TMessage;
   _cursor: TCursor;
   rec: TPgBarOps;
@@ -320,7 +241,7 @@ begin
 
   Get_temp_file_name;
   FCandidateStream := TMemoryStream.Create;
-  leaf_list := TList.Create;
+  leaf_list := TObjectList.Create;
   lenList := Length(FParentNodeAra);
 
   FRecurseCount := 0;
@@ -344,14 +265,12 @@ begin
       FPassCount := 0;
       get_the_leaves(FParentNodeAra[idx], leaf_list, 0);
       {  TODO: this is the place to yield the leaf_list  }
-      //build_candidate_list(leaf_list);
-      //leaf_list.Clear;
-      //leaf_count := leaf_list.Count;
+
       Inc(FRecurseCount, FPassCount);
       Inc(idx);
     end;
-    //lenList := leaf_list.Count;
-    build_candidate_list(leaf_list);
+
+    FinalOutputCallback(build_candidate_list(leaf_list));
   finally
     Inc(idx);
 
@@ -370,7 +289,7 @@ begin
 end;
 
 procedure TNodeWalker.get_the_leaves(parent_node: TTreeNode;
-  leaf_list: TList; lvl: integer);
+  leaf_list: TObjectList; lvl: integer);
 (*   function TNodeWalker.get_the_leaves
 *    parameters: parent_node : TTreeNode;
 *                pOutStr : String;
@@ -383,6 +302,7 @@ procedure TNodeWalker.get_the_leaves(parent_node: TTreeNode;
 var
   idx: integer;
   work_node, prev_node: TTreeNode;
+  s : String;
 begin
   Inc(FPassCount);
   Inc(lvl);
@@ -390,12 +310,13 @@ begin
     work_node := parent_node.GetFirstChild;
     while Assigned(work_node) do
     begin
+      s := work_node.Text;
       prev_node := work_node;
       get_the_leaves(work_node, leaf_list, lvl);
       work_node := parent_node.GetNextChild(work_node);
       {  if work_node is nil, prev_node is the leaf. }
       if (lvl = FTreeWidth - 1) and (not Assigned(work_node)) then
-        leaf_list.Add(@prev_node);
+        leaf_list.Add(prev_node);
     end;
 
     {$ifdef debug}
@@ -405,7 +326,7 @@ begin
   end;
 end;
 
-procedure TNodeWalker.build_candidate_list(leafList : TList);
+function TNodeWalker.build_candidate_list(leafList : TObjectList) : TStringList;
 (*     procedure TNodeWalker.build_candidate_list
 *      using the parameter leafList, which contains pointers to the
 *      leaves of the main TTreeView, builds the candidate word list
@@ -417,23 +338,36 @@ procedure TNodeWalker.build_candidate_list(leafList : TList);
 *      parent, grand-parent... walk; this works because all possible
 *      permutations are in the tree.
 *)
-  function build_candidate(leaf: TTreeNode; word_len: integer): string;
+  function build_candidate(leaf: TTreeNode; word_len: integer): AnsiString;
+  var
+    s : ansistring;
+    count : Integer;
   begin
-    Result := EmptyStr;
-    while Assigned(leaf) do
-    begin
-      Result := leaf.Text + Result;
-      if Length(Result) = word_len then
-        Break;
-      leaf := leaf.Parent;
-    end;
-  end;
+    Result := '';
+    try
+        //while (leaf.Count <= word_len) and (leaf.Count > -1) do
+        while Assigned(leaf) do
+        //while Assigned(leaf.Text) do
+        begin
+          s := leaf.Text;
+          if (s[1] in ALPHA_CHARS) then
+            Result := leaf.Text + Result;
+          if Length(Result) = word_len then
+            Break;
+          leaf := leaf.Parent;
+          count := leaf.Count;
+        end;
+
+		except on Ex : Exception do
+      ShowMessage(Format('function build_candidate exception: %s', [Ex.Message]));
+		end;
+	end;
 
 var
   lf_ndx, iwordLen, minWordLen, len_ndx: integer;
   sz: QWord;
   leaf_list_count: integer;
-  sCandidate: ansistring;
+  sCandidate: AnsiString;
 begin
   minWordLen := 4;
   if FGet3LetterWords then
@@ -442,7 +376,6 @@ begin
   lf_ndx := 0;
   len_ndx := FTreeWidth;    // len_ndx will be dec'd downto minWordLen
 
-  //FCandidateStream := TFileStream.Create(Temp_file_name, fmCreate or fmOpenReadWrite);
   FCandidateStream.Clear;
   leaf_list_count := leafList.Count;
   try
@@ -452,15 +385,16 @@ begin
       begin
 
         sCandidate := build_candidate(TTreeNode(leafList[lf_ndx]), len_ndx);
-        //if FCandidateList.IndexOf(sCandidate) < 0 then
-        //    FCandidateList.Add(sCandidate);
+        if String(sCandidate) = '' then
+          raise Exception.Create('TNodeWalker.build_candidate_list: '
+                    + 'build_candidate returned an empty string.');
         FCandidateStream.WriteAnsiString(sCandidate);
         Inc(lf_ndx);
         if lf_ndx = leafList.Count then
           Break;      // the inner loop
       end;
       CandidateCallback(FCandidateStream);
-      GetFromDb;
+      Result := Get_goodWords_from_bufDset;
       FCandidateStream.Clear;
 
       if len_ndx = minWordLen then
