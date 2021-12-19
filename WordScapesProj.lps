@@ -18,18 +18,19 @@
         <ComponentName Value="V"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <TopLine Value="467"/>
-        <CursorPos Y="483"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="1007"/>
+        <CursorPos Y="1041"/>
+        <FoldState Value=" TKqa08q"/>
         <UsageCount Value="200"/>
         <Bookmarks Count="5">
-          <Item0 Y="213" ID="2"/>
-          <Item1 Y="474" ID="3"/>
-          <Item2 Y="512" ID="8"/>
-          <Item3 Y="438" ID="7"/>
-          <Item4 Y="534" ID="6"/>
+          <Item0 Y="440" ID="7"/>
+          <Item1 X="21" Y="339" ID="8"/>
+          <Item2 Y="503" ID="6"/>
+          <Item3 X="32" Y="621" ID="4"/>
+          <Item4 X="58" Y="483" ID="9"/>
         </Bookmarks>
         <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Logging.pas"/>
@@ -77,11 +78,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="WordDmod"/>
-        <EditorIndex Value="1"/>
-        <TopLine Value="194"/>
-        <CursorPos Y="215"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="262"/>
+        <CursorPos X="9" Y="283"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="frmcompword_w_db.pp"/>
@@ -90,44 +91,42 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="frmCompWord_W_DB"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="123"/>
-        <CursorPos Y="143"/>
-        <FoldState Value=" T3od2N_"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="339"/>
+        <CursorPos Y="457"/>
+        <FoldState Value=" T3of0a0115"/>
         <UsageCount Value="200"/>
         <Bookmarks Count="2">
-          <Item0 X="33" Y="232" ID="5"/>
-          <Item1 X="28" Y="273" ID="9"/>
+          <Item0 X="24" Y="454" ID="1"/>
+          <Item1 Y="164" ID="5"/>
         </Bookmarks>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="wordscapehelper.pp"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="WordscapeHelper"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="21"/>
-        <CursorPos Y="43"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="117"/>
+        <CursorPos X="15" Y="138"/>
         <UsageCount Value="202"/>
+        <Loaded Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="keepit.txt"/>
-        <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="495"/>
-        <CursorPos Y="558"/>
-        <UsageCount Value="137"/>
+        <TopLine Value="427"/>
+        <CursorPos X="10" Y="447"/>
+        <UsageCount Value="150"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit>
       <Unit>
         <Filename Value="test_script.txt"/>
-        <IsPartOfProject Value="True"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="5" Y="15"/>
-        <UsageCount Value="89"/>
+        <UsageCount Value="102"/>
         <DefaultSyntaxHighlighter Value="None"/>
       </Unit>
       <Unit>
@@ -139,7 +138,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="223"/>
         <CursorPos Y="253"/>
-        <UsageCount Value="135"/>
+        <UsageCount Value="133"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -150,7 +149,7 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="61" Y="7"/>
         <ComponentState Value="1"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="123"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -158,7 +157,7 @@
         <UnitName Value="TreeNodeWalker"/>
         <EditorIndex Value="-1"/>
         <CursorPos Y="7"/>
-        <UsageCount Value="28"/>
+        <UsageCount Value="26"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
@@ -167,15 +166,15 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="3"/>
         <CursorPos X="60" Y="5"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="8"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\customform.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="909"/>
-        <CursorPos Y="925"/>
-        <UsageCount Value="16"/>
+        <TopLine Value="1872"/>
+        <CursorPos Y="1892"/>
+        <UsageCount Value="14"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\lclclasses.pp"/>
@@ -183,7 +182,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="138"/>
         <CursorPos Y="156"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\forms.pp"/>
@@ -191,43 +190,29 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1487"/>
         <CursorPos X="15" Y="1505"/>
-        <UsageCount Value="8"/>
+        <UsageCount Value="6"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\treeview.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="6433"/>
         <CursorPos X="42" Y="6449"/>
-        <UsageCount Value="9"/>
-      </Unit>
-      <Unit>
-        <Filename Value="D:\lazarus_64\lcl\include\containedaction.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="73"/>
-        <CursorPos Y="100"/>
-        <UsageCount Value="2"/>
-      </Unit>
-      <Unit>
-        <Filename Value="D:\lazarus_64\lcl\include\customaction.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="227"/>
-        <CursorPos Y="246"/>
-        <UsageCount Value="2"/>
+        <UsageCount Value="7"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\comctrls.pp"/>
         <UnitName Value="ComCtrls"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2943"/>
-        <CursorPos X="3" Y="2963"/>
-        <UsageCount Value="6"/>
+        <TopLine Value="586"/>
+        <CursorPos X="14" Y="605"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\custommemo.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="173"/>
         <CursorPos Y="191"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\controls.pp"/>
@@ -235,28 +220,21 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="2100"/>
         <CursorPos X="15" Y="2116"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="4"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\tabsheet.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="32"/>
         <CursorPos Y="56"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="4"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\interfaces\win32\win32callback.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="2722"/>
-        <CursorPos Y="2740"/>
-        <UsageCount Value="6"/>
-      </Unit>
-      <Unit>
-        <Filename Value="D:\lazarus_64\lcl\include\control.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2813"/>
-        <CursorPos Y="2831"/>
-        <UsageCount Value="2"/>
+        <TopLine Value="2750"/>
+        <CursorPos Y="2771"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\fpc\3.2.2\source\packages\fcl-base\src\contnrs.pp"/>
@@ -264,27 +242,27 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="67"/>
         <CursorPos X="14" Y="86"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\fpc\3.2.2\source\rtl\inc\objpash.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="198"/>
         <CursorPos X="21" Y="215"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
         <Filename Value="WordScapes.lfm"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
         <DefaultSyntaxHighlighter Value="LFM"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\wincontrol.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="4420"/>
-        <CursorPos Y="4439"/>
-        <UsageCount Value="2"/>
+        <TopLine Value="5411"/>
+        <CursorPos Y="5430"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\lmessages.pp"/>
@@ -292,7 +270,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="29"/>
         <CursorPos X="3" Y="48"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="4"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\lclintf.pas"/>
@@ -300,79 +278,66 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="71"/>
         <CursorPos X="35" Y="39"/>
-        <UsageCount Value="1"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\customcheckbox.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="115"/>
         <CursorPos Y="134"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\application.inc"/>
         <EditorIndex Value="-1"/>
-        <TopLine Value="1039"/>
-        <CursorPos Y="1067"/>
-        <UsageCount Value="10"/>
+        <TopLine Value="1046"/>
+        <CursorPos Y="1066"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\grids.pas"/>
         <UnitName Value="Grids"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="9962"/>
-        <CursorPos Y="9988"/>
-        <UsageCount Value="6"/>
-      </Unit>
-      <Unit>
-        <Filename Value="D:\lazarus_64\lcl\interfaces\win32\win32winapi.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2752"/>
-        <CursorPos Y="2771"/>
-        <UsageCount Value="2"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="11084"/>
+        <CursorPos Y="11101"/>
+        <UsageCount Value="11"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\lclmessageglue.pas"/>
         <UnitName Value="LCLMessageGlue"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="98"/>
-        <CursorPos Y="116"/>
-        <UsageCount Value="2"/>
-      </Unit>
-      <Unit>
-        <Filename Value="D:\lazarus_64\lcl\include\toolbutton.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="166"/>
-        <CursorPos Y="184"/>
-        <UsageCount Value="2"/>
+        <CursorPos Y="112"/>
+        <UsageCount Value="9"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="940"/>
         <CursorPos X="15" Y="976"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="8"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\fpc\3.2.2\source\rtl\inc\objpas.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="331"/>
         <CursorPos X="10" Y="335"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\progressbar.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="208"/>
         <CursorPos X="3" Y="210"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="1"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\fpc\3.2.2\source\rtl\objpas\sysutils\sysutilh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="88"/>
         <CursorPos X="4" Y="107"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\lresources.pp"/>
@@ -380,157 +345,177 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="543"/>
         <CursorPos X="11" Y="483"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="4"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\fpc\3.2.2\source\packages\fcl-db\src\base\bufdataset.pas"/>
         <UnitName Value="BufDataset"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="81"/>
         <CursorPos Y="101"/>
-        <UsageCount Value="17"/>
+        <UsageCount Value="16"/>
         <Bookmarks Count="1">
           <Item0 X="20" Y="637" ID="1"/>
         </Bookmarks>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\fpc\3.2.2\source\rtl\objpas\classes\streams.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="116"/>
         <CursorPos X="24" Y="116"/>
-        <UsageCount Value="10"/>
+        <UsageCount Value="8"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\fpc\3.2.2\source\packages\fcl-db\src\base\db.pas"/>
         <UnitName Value="DB"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1360"/>
         <CursorPos X="3" Y="1380"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\lazarus_64\lcl\stdctrls.pp"/>
+        <UnitName Value="StdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="789"/>
+        <CursorPos X="25" Y="808"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\lazarus_64\lcl\include\customedit.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="128"/>
+        <CursorPos X="3" Y="140"/>
+        <UsageCount Value="9"/>
+      </Unit>
+      <Unit>
+        <Filename Value="D:\lazarus_64\components\lazutils\lazstringutils.pas"/>
+        <UnitName Value="LazStringUtils"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="78"/>
         <UsageCount Value="10"/>
-        <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="133" TopLine="109"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1028" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="136" TopLine="109"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1035" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="137" TopLine="109"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="138" TopLine="109"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1028" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="140" TopLine="109"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1035" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="142" TopLine="110"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="144" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1028" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="138" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1035" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="140" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="142" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1038" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="144" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1017" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="138" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1020" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="140" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1023" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="142" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1025" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="144" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="138" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1028" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="140" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1035" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="142" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="144" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1028" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="138" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1035" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="140" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="142" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1028" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="144" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1035" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="138" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="140" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1028" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="142" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1035" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="144" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="142" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1028" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="143" TopLine="112"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1035" TopLine="1006"/>
       </Position>
       <Position>
-        <Filename Value="frmcompword_w_db.pp"/>
-        <Caret Line="397" TopLine="373"/>
+        <Filename Value="WordScapes.pas"/>
+        <Caret Line="1026" TopLine="1005"/>
       </Position>
     </JumpHistory>
     <RunParams>
@@ -547,8 +532,7 @@
       <List Name="LaunchingApplication" Type="File" Count="1">
         <Item1 Value="C:\WINDOWS\system32\cmd.exe /C ${TargetCmdLine}"/>
       </List>
-      <List Name="WorkingDirectory" Type="File" Count="1"/>
-      <List Name="CommandLineParameters" Count="2">
+      <List Name="CommandLineParameters" Count="1">
         <Item1 Value="d:\words.txt"/>
       </List>
     </HistoryLists>
@@ -560,39 +544,15 @@
         <WatchScope Value="wpsLocal"/>
         <WatchKind Value="wpkWrite"/>
         <Source Value="frmcompword_w_db.pp"/>
-        <Line Value="103"/>
-      </Item>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="WordScapes.pas"/>
-        <Line Value="527"/>
-      </Item>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="frmcompword_w_db.pp"/>
-        <Line Value="273"/>
-      </Item>
-      <Item>
-        <Kind Value="bpkSource"/>
-        <WatchScope Value="wpsLocal"/>
-        <WatchKind Value="wpkWrite"/>
-        <Source Value="frmcompword_w_db.pp"/>
-        <Line Value="397"/>
+        <Line Value="104"/>
       </Item>
     </BreakPoints>
     <Watches>
       <Item>
-        <Expression Value="sCandidate"/>
+        <Expression Value="row"/>
       </Item>
       <Item>
-        <Expression Value="s"/>
-      </Item>
-      <Item>
-        <Expression Value="count"/>
+        <Expression Value="seek"/>
       </Item>
     </Watches>
   </Debugging>

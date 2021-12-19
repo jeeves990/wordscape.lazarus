@@ -26,6 +26,8 @@ type
     ActEnableMnMnu: TAction;
     ActGetFile: TAction;
     ActGetStarted: TAction;
+		ActAdd_2_db : TAction;
+		ActRemoveWord : TAction;
     ActionTestCalculate: TAction;
     ActLoadSelection: TAction;
     ActLoadWords: TAction;
@@ -68,6 +70,8 @@ type
     lblTakeAt1: TLabel;
     lblTvuItemCount: TLabel;
     MenuItem1: TMenuItem;
+		MenuItem2 : TMenuItem;
+		MenuItem3 : TMenuItem;
     MenuItem6: TMenuItem;
     mnMnu: TMainMenu;
     mnuItm_bld_sub_trees: TMenuItem;
@@ -96,10 +100,15 @@ type
     pnl_words_grid: TPanel;
     Popup: TPopupMenu;
     Processwordlist1: TMenuItem;
-    words_mmo: TMemo;
     sGrid_output: TStringGrid;
     sgrid_raw_words: TStringGrid;
     dbop_splitter: TSplitter;
+		all_words_grid : TStringGrid;
+		ToolBar1 : TToolBar;
+		ToolButton10 : TToolButton;
+		ToolButton7 : TToolButton;
+		ToolButton8 : TToolButton;
+		ToolButton9 : TToolButton;
     tvu_splitter: TSplitter;
     statusBar: TStatusBar;
     tb_build_tree: TToolButton;
@@ -120,6 +129,7 @@ type
     tvu: TTreeView;
     MainPropStorage: TXMLPropStorage;
 
+		procedure ActAdd_2_dbExecute(Sender : TObject);
     procedure ActBldSubTreesExecute(Sender: TObject);
     procedure ActBldTreeExecute(Sender: TObject);
     procedure actCloseExecute(Sender: TObject);
@@ -127,17 +137,20 @@ type
     procedure ActLoadSelectionExecute(Sender: TObject);
     procedure ActLoadWordsExecute(Sender: TObject);
     procedure ActNodeWalkerExecute(Sender: TObject);
+		procedure ActRemoveWordExecute(Sender : TObject);
     procedure BtnCloseClick(Sender: TObject);
     procedure Close1Click(Sender: TObject);
     procedure edCharStringKeyDown(Sender: TObject; var Key: word;
       Shift: TShiftState);
     procedure edCharStringKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
-    procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure MaskEditEnter(Sender: TObject);
     procedure mnuItm_expose_test_tabClick(Sender: TObject);
+		procedure sGrid_outputDblClick(Sender : TObject);
     procedure tvuChange(Sender: TObject; Node: TTreeNode);
+		procedure all_words_gridKeyUp(Sender : TObject; var Key : Word;
+					Shift : TShiftState);
 
   private
     FAraOfTvu: array of TTreeView;
@@ -146,20 +159,19 @@ type
     FMinLen: integer;
     FNodeWalker: TNodeWalker;
     FStartString: string;
-    //FTreeHeight: integer;
+    FAlphaList : TStringList;
     FTreeWidth: integer;
     F_Handle: uint64;
     FNodeWalker_rowCount_array: array of integer;
 
     function AddThisLevelsChildren(_str: string; Parent: TTreeNode): TTreeNode;
 		procedure AfterCreate(ptr : IntPtr);
+		procedure Bld_alpha_list(ptr : IntPtr);
     procedure CursorFeedback(arg_cursor: integer);
     function ExtractSubTree(toLevel: integer): TTreeView;
     function find_column_of_grid(_len: integer; grid: TStringGrid): integer;
     function GetLmtClause: utf8string;
     function GetTreeWidth: integer;
-    function Get_good_words_from_dataset(const parm_str: string;
-      var slst: TStringList): boolean;
     function ParseLmtClause({var startAt, howMany: integer}): boolean;
 
     procedure AddTheChildren(Str: string; lvl: integer; ParmNode: TTreeNode);
@@ -169,15 +181,15 @@ type
     procedure FrmPsWordsFormClose(Sender: TObject);
     procedure PgBarFeedback(rec: TPgBarOps);
     procedure Populate_output_grid(lst: TStringList);
-    //procedure Populate_output_grid(strm: TFileStream);
 
-    procedure Populate_raw_words(strm: TMemoryStream);
-    //procedure Populate_raw_words(lst: TStringList);
+    procedure Populate_raw_words(lst: TStringList);
+		procedure Return_output_count(dummy : Integer);
+		procedure re_build_tree(ptr : IntPtr);
 
     procedure SetLmtClause(AValue: utf8string);
     procedure SetStartString(AValue: string);
-    procedure setup_output_list_grid;
-    procedure setup_raw_list_grid;
+
+    procedure setup_list_grids;
     procedure setup_pgBar(max: integer = 0);
     procedure set_actions(Sender: TCallers);
     procedure StatusBarFeedback(_str: string);
@@ -201,7 +213,7 @@ implementation
 
 {$R *.lfm}
 
-uses Character;
+uses Character, DB;
 
 const
   First = 1;
@@ -317,6 +329,7 @@ begin
   finally
     CursorFeedback(_cursor);
   end;
+  ActNodeWalker.Execute;
 end;
 
 procedure TV.ActNodeWalkerExecute(Sender: TObject);
@@ -324,7 +337,7 @@ var
   _tree_height: integer;
 begin
   {  sgrid_raw_words is reconfigured on each call to this method.  }
-  setup_raw_list_grid;
+  setup_list_grids;
   Application.ProcessMessages;
   _tree_height := Length(CleanDuplicateChars(FStartString));
   FNodeWalker.setup_walker(tvu, _tree_height, FTreeWidth, ckb_take_threes.Checked);
@@ -336,7 +349,7 @@ begin
   end;
 end;
 
-procedure TV.setup_raw_list_grid;
+procedure TV.setup_list_grids;
 (*
  *  procedure TV.setup_raw_list_grid;
  *  Set the columns for the raw list elements. If ckb_take_threes.Checked,
@@ -348,56 +361,45 @@ const
 var
   i, col_cnt, ndx, col_cnt_diff: integer;
   heading_str: string;
-  grid: TStringGrid;
+  grid, out_grid: TStringGrid;
 begin
   grid := sgrid_raw_words;
+  out_grid := sGrid_output;
   Clear_string_grid(grid, 1, 1, 0, 1);
+  Clear_string_grid(sGrid_output, 1, 1, 0, 1);
   grid.ColCount := 0;
+  out_grid.ColCount := 0;
   col_cnt_diff := 3;
   if ckb_take_threes.Checked then
     col_cnt_diff := 2;
 
   col_cnt := Length(edCharString.Text) - col_cnt_diff;
   Inc(col_cnt_diff);
-  //ndx :=
+
   i := 0;
   while i < col_cnt do
   begin
     heading_str := Format(ColHeading, [i + col_cnt_diff]);
+
     grid.ColCount := grid.ColCount + 1;
     grid.Cells[i, 0] := heading_str;
     grid.Objects[i, 0] := TObject(i + col_cnt_diff);
+
+    out_grid.ColCount := grid.ColCount + 1;
+    out_grid.Cells[i, 0] := heading_str;
+    out_grid.Objects[i, 0] := TObject(i + col_cnt_diff);
     Inc(i);
   end;
   SetLength(FNodeWalker_rowCount_array, grid.ColCount);
   for i := 0 to grid.ColCount - 1 do
     FNodeWalker_rowCount_array[i] := 0;
-  setup_output_list_grid;
-end;
-
-procedure TV.setup_output_list_grid;
-var
-  i_col, col_cnt, ndx, col_cnt_diff: integer;
-  heading_str: string;
-  grid, raw_grid: TStringGrid;
-begin
-  grid := sGrid_output;
-  raw_grid := sgrid_raw_words;
-  grid.Clear;
-  grid.ColCount := raw_grid.ColCount;
-  grid.RowCount := raw_grid.RowCount;
-  for i_col := 0 to raw_grid.ColCount - 1 do
-  begin
-    grid.Objects[i_col, 0] := raw_grid.Objects[i_col, 0];
-    grid.Cells[i_col, 0] := raw_grid.Cells[i_col, 0];
-  end;
 end;
 
 function TV.find_column_of_grid(_len: integer; grid: TStringGrid): integer;
 (*
  *    function find_column_of_grid searches for the column that
  *    will receive _len letter words by searching iteratively
- *    through sgrid_raw_words.Objects for an object made like
+ *    through grid.Objects for an object made like
  *    TObject(string length).
  *)
 var
@@ -413,12 +415,12 @@ begin
     Inc(i);
   end;
   if i = grid.ColCount then
-    raise Exception.Create('TV.Populate_raw_words.find_column_of_grid ' +
+    raise Exception.Create('TV.find_column_of_grid ' +
       'exception: column not found.');
   Result := i;
 end;
 
-procedure TV.Populate_raw_words(strm: TMemoryStream);
+procedure TV.Populate_raw_words(lst : TStringList);
 (*
  *  procedure TV.Populate_raw_words:
  *  the strm's of words are passed one length at a time. E.g. assume user inputs
@@ -435,32 +437,32 @@ var
   str: ansistring;
   sz : DWORD;
 begin
-  sz := strm.Size;
-  if strm.Size = 0 then
+  sz := lst.Count;
+  if lst.Count = 0 then
     raise Exception.Create('TV.Populate_raw_words: input stringStream is empty');
 
-  strm.Seek(0, soBeginning);
-  str := strm.ReadAnsiString;
-  if String(str) = '' then
-  begin
-    ShowMessage('TV.Populate_raw_words: stringStream is defective??');
-    Exit;
-	end;
-
-	s_len := Length(str);
+  lst.Sort;
+	s_len := Length(lst[0]);
   _col := find_column_of_grid(s_len, sgrid_raw_words);
   i_row := 1;    // there is a fixed row
+  i := 0;
   try
     try
-      while str > '' do
-      begin
-        sgrid_raw_words.RowCount := sgrid_raw_words.RowCount +1;
-        sgrid_raw_words.Cells[_col, i_row] := UpperCase(str);
-        Inc(i_row);
-        if strm.Position >= strm.Size then
-          Break;
-        str := strm.ReadAnsiString;
-      end;
+      repeat
+          begin
+            // get the current element into the str variable
+            str := lst[i];
+            // add a row to the stringGrid
+            sgrid_raw_words.RowCount := sgrid_raw_words.RowCount +1;
+            // set the cell in the column and in the row
+            sgrid_raw_words.Cells[_col, i_row] := UpperCase(str);
+            Inc(i_row);
+            Inc(i);
+            if i = lst.Count then
+              Break;
+          end;
+      until i = lst.Count;
+
       Inc(FNodeWalker_rowCount_array[_col], i_row - 1);
     except on Ex : Exception do
       ShowMessage(Format('TV.Populate_raw_words exception in loop: %s @row %d',
@@ -471,18 +473,35 @@ begin
   end;
 end;
 
+procedure TV.re_build_tree(ptr : IntPtr);
+begin
+    ActBldTree.Execute;
+end;
+
+procedure TV.Return_output_count(dummy : Integer);
+begin
+  FNodeWalker.OutputCount := sGrid_output.RowCount;
+end;
+
 procedure TV.Populate_output_grid(lst : TStringList);
 (*
  *    TV.Populate_output_grid
+ *    The parameter lst should be the 'clean' list of words
+ *    from the raw_list_grid. By 'clean' is meant, checked by
+ *    the words from the all_words_grid to make sure those
+ *    words are recognizably English.
  *)
 var
   i_col, i_row, str_len, ndx: integer;
   str: ansistring;
 begin
   i_col := 0;
-  if lst.Count = 0 then
-    raise Exception.Create('TV.Populate_output_grid: Parameter lst is empty');
-  str := lst[0];
+  //if lst.Count = 0 then
+  //begin
+  //    ShowMessage('TV.Populate_output_grid: param list is empty.');
+  //    Exit;
+	//end;
+	str := lst[0];
   str_len := Length(str);
 
   i_col := find_column_of_grid(str_len, sGrid_output);
@@ -491,14 +510,20 @@ begin
   try
     while True do
     begin
-      if sGrid_output.RowCount < i_row +1 then
+      if Is_all_consanants(lst[ndx]) then
+        begin
+          Inc(ndx);
+          if ndx = lst.Count then
+            Break;
+          Continue;
+				end;
+			if sGrid_output.RowCount < i_row +1 then
         sGrid_output.RowCount := i_row +1;
-      sGrid_output.Cells[i_col, i_row] := UpperCase(str);
-      Inc(i_row);
+      sGrid_output.Cells[i_col, i_row] := UpperCase(lst[ndx]);
       Inc(ndx);
-      if ndx >= lst.Count then
+      if ndx = lst.Count then
         Break;
-      str := lst[ndx];
+      Inc(i_row);
     end;
   finally
     try
@@ -509,26 +534,6 @@ begin
       ShowMessage(Format('TV.Populate_output_grid exception: %s', [Ex.Message]));
 		end;
 	end;
-end;
-
-function TV.Get_good_words_from_dataset(const parm_str : string;
-			var slst : TStringList) : boolean;
-(*
- *    TV.Get_good_words_from_DB: passes parm_str to the database to discover
- *    the legitimate words in that parm_str. Those legitimate words are
- *    returned to the caller via the slst : TStringList parameter.
- *)
-var
-  sql: string;
-//const
-//  WORD_SELECT_SQL = 'SELECT word FROM words WHERE word in (%s) ORDER BY word';
-
-begin
-  Result := False;
-  //sql := Format(WORD_SELECT_SQL, [parm_str]);
-  try
-  finally
-  end;
 end;
 
 procedure TV.buildATree(tree: TTreeView; const toLevel: integer);
@@ -773,11 +778,17 @@ begin
     SetLength(FAraOfTvu, Length(FAraOfTvu) - 2);
   end;
   FNodeWalker.Free;
+  FreeAndNil(FAlphaList);
 end;
 
 procedure TV.mnuItm_expose_test_tabClick(Sender: TObject);
 begin
   tsTesting.Visible := True;
+end;
+
+procedure TV.sGrid_outputDblClick(Sender : TObject);
+begin
+  ActRemoveWord.Execute;
 end;
 
 procedure TV.Close1Click(Sender: TObject);
@@ -794,9 +805,17 @@ begin
   end;
 end;
 
-procedure TV.FormActivate(Sender: TObject);
+procedure TV.all_words_gridKeyUp(Sender : TObject; var Key : Word;
+			Shift : TShiftState);
+var
+  ndx, location : Integer;
+  c : Char;
 begin
-  //tb_build_tree.SetFocus;
+  if not (Key in [VK_A..VK_Z]) then Exit;
+  c := LowerCase(Chr(key));
+  ndx := FAlphaList.IndexOf(c);
+  location := Integer(FAlphaList.Objects[ndx]);
+  all_words_grid.Row := location;
 end;
 
 {$ASSERTIONS ON}
@@ -821,23 +840,57 @@ begin
   MainPropStorage.Restore;
   SetLength(FAraOfTvu, 0);
   set_actions(get_started);
-  Assert(self.Handle <> Application.Handle, 'self.handle <> Application.Handle');
+  //Assert(self.Handle <> Application.Handle, 'self.handle <> Application.Handle');
   FNodeWalker := TNodeWalker.Create(self);
 
-  //FNodeWalker.StringListCallback := TStringListCallbackMethod(Populate_raw_words);
-  FNodeWalker.CandidateCallback := TMemoryStreamCallbackMethod(Populate_raw_words);
+  FNodeWalker.CandidateCallback := TStringListCallbackMethod(Populate_raw_words);
 
   FNodeWalker.FinalOutputCallback := TStringListCallbackMethod(Populate_output_grid);
   FNodeWalker.PgBarCallback := TPgBarCallbackMethod(PgBarFeedback);
   FNodeWalker.CursorCallback := TIntegerCallbackMethod(CursorFeedback);
   FNodeWalker.StatusBarCallback := TStringCallbackMethod(StatusBarFeedback);
+  FNodeWalker.FinalOutputCountCallBack := TIntegerCallbackMethod(Return_output_count);
+
+  FAlphaList := TStringList.Create;
   Application.QueueAsyncCall(AfterCreate, 0);
 end;
 
 procedure TV.AfterCreate(ptr : IntPtr);
+var
+  lst : TStringList;
 begin
-  words_mmo.Lines.LoadFromFile(WordsFile);
-  Word_dmod.Populate_mem_dataset(words_mmo.Lines);
+  lst := TStringList.Create;
+  try
+    lst.LoadFromFile(WordsFile);
+    all_words_grid.RowCount := lst.Count;
+    all_words_grid.Cols[0].AddStrings(lst);
+    Word_dmod.Populate_WordBufList(lst);
+
+	finally
+    FreeAndNil(lst);
+	end;
+	Application.QueueAsyncCall(Bld_alpha_list, 0);
+end;
+
+procedure TV.Bld_alpha_list(ptr : IntPtr);
+var
+  i, rec_i : Integer;
+  c : AnsiChar;
+  p : PChar;
+begin
+  FAlphaList.Clear;
+  c := 'a';
+  i := 0;
+  rec_i := 0;
+  repeat
+    if LowerCase(PChar(all_words_grid.Cells[0, i])^) = c then
+      begin
+        FAlphaList.AddObject(c, TObject(i));
+        Inc(Ord(c));
+        Inc(rec_i);
+			end;
+		Inc(i);
+	until i = all_words_grid.RowCount;
 end;
 
 function TV.ParseLmtClause({var startAt, howMany: integer}): boolean;
@@ -939,6 +992,84 @@ begin
     BuildCombinationTree(i);
   end;
   //bldTreeWords := TfmBldTreeWords.Create(self, tvu, ht, wd);
+end;
+
+procedure TV.ActAdd_2_dbExecute(Sender : TObject);
+const
+  _sql = 'INSERT INTO words (word) VALUES (%s)';
+var
+  aWord, s : String;
+begin
+  if not InputQuery('Add word to database', 'Enter word to add', aWord) then
+    Exit;
+
+  s :=  Format(_sql, [QuotedStr(aWord)]);
+  Word_Dmod.Do_exec_sql(s);
+end;
+
+procedure Pack_column(grid : TStringGrid; col : Integer);
+label
+  OuterLoop;
+var
+  seek, row : Integer;
+begin
+  row := 1;
+  while True do
+  begin
+    OuterLoop:
+      if row >= grid.RowCount then
+          Break;
+
+      if grid.Cells[col, row] = '' then
+        begin
+          seek := row + 1;
+          while seek < grid.RowCount do
+            begin
+              if grid.Cells[col, seek] > '' then
+                begin
+                  grid.Cells[col, row] := grid.Cells[col, seek];
+                  grid.Cells[col, seek] := '';
+                  Inc(row);
+                  goto OuterLoop;
+								end;
+							Inc(seek);
+						end;
+				end;
+      Inc(row);
+	end;
+  grid.Refresh;
+end;
+
+procedure TV.ActRemoveWordExecute(Sender : TObject);
+const
+  _sql = 'DELETE FROM words WHERE word = %s';
+var
+  aWord, s : String;
+  q : TSQLQuery;
+  row, col : Integer;
+  b_cellValue : Boolean;
+begin
+  aWord := '';
+  row := 1;
+  b_cellValue := False;
+  if not isRowEmpty(sGrid_output, row) then
+    begin
+        row := sGrid_output.Row;
+        col := sGrid_output.col;
+        aWord := sGrid_output.Cells[col, row];
+        b_cellValue := True;
+		end;
+	if not InputQuery('Remove word from database', 'Enter word to remove', aWord)
+  then  Exit;
+
+  s :=  Format(_sql, [QuotedStr(aWord)]);
+  if Word_Dmod.Do_exec_sql(s) and b_cellValue then
+    begin
+      sGrid_output.Cells[col, row] := '';
+      sGrid_output.Refresh;
+      Pack_column(sgrid_output, col);
+      sGrid_output.Refresh;
+		end;
 end;
 
 procedure TV.ActLoadWordsExecute(Sender: TObject);

@@ -93,14 +93,6 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="WordscapeHelper"/>
       </Unit>
-      <Unit>
-        <Filename Value="keepit.txt"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="test_script.txt"/>
-        <IsPartOfProject Value="True"/>
-      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

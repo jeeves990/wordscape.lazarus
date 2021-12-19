@@ -19,17 +19,18 @@ type
   TNodeWalker = class(TTreeView)
   private
     FFinalList: TStringList;     // FFinalList is good words from database
-    FCandidateStream: TMemoryStream;
+    // FCandidateStream: TMemoryStream;
+    FCandidateList : TStringList;
     FTree: TTreeView;
     FTreeHeight, FTreeWidth: integer;
     FRecurseCount: integer;
     FPassCount: integer;
     FGet3LetterWords: boolean;
-    FParentHandle: uint64;
+    FOutputCount: Integer;
 
     function build_candidate_list(leafList : TObjectList) : TStringList;
     //procedure build_candidate_list(leafList: TObjectList);
-    function Get_goodWords_from_bufDset : TStringList;
+    function Get_goodWords_from_qry : TStringList;
     function GetLimitClause: string;
     function get_top_level_node_into_array: integer;
     procedure Timer_timeout(Sender: TObject);
@@ -52,23 +53,23 @@ type
     property LimitClause: string read FLimitClause write FLimitClause;
     property Tree: TTreeView write SetTree;
     property OutList: TStringList read FFinalList;
-    //property PrepList: TStringList read FCandidateList;
     property TreeWidth: integer read FTreeWidth write FTreeWidth;
     property TreeHeight: integer read FTreeHeight write FTreeHeight;
-    //property CandidateList: TStringList read FCandidateList write FCandidateList;
-    property ParentHandle: uint64 read FParentHandle write FParentHandle;
+    property OutputCount: Integer write FOutputCount;
+
   var
     ObjectListCallback: TObjectListCallbackMethod;
     LeafListCallback: TObjectListCallbackMethod;
     FLeafListCallback: TMemoryStreamCallbackMethod;
     StringListCallback: TStringListCallbackMethod;
     StringStreamCallback: TStringStreamCallbackMethod;
-    CandidateCallback: TMemoryStreamCallbackMethod;
+    CandidateCallback: TStringListCallbackMethod;
     MemoryStreamCallback: TMemoryStreamCallbackMethod;
     PgBarCallback: TPgBarCallbackMethod;
     CursorCallback: TIntegerCallbackMethod;
     StatusBarCallback: TStringCallbackMethod;
     FinalOutputCallback: TStringListCallbackMethod;
+    FinalOutputCountCallBack : TIntegerCallbackMethod;
   end;
 
 var
@@ -103,7 +104,7 @@ begin
   PgBarCallback(rec);
 end;
 
-function TNodeWalker.Get_goodWords_from_bufDset : TStringList;
+function TNodeWalker.Get_goodWords_from_qry : TStringList;
 {
     implemented as of 10/20/2021
     looks like getting words from database
@@ -121,28 +122,78 @@ function TNodeWalker.Get_goodWords_from_bufDset : TStringList;
     be tested agains the WordBuffer and the non-words will be added to
     the stringlist.
 }
+    function build_parameter_string : String;
+    var
+      str : String;
+      i : Integer;
+    begin
+      Result := '';
+      i := 0;
+      // build the parameter string for use by Word_Dmod.qry
+      repeat
+        str := FCandidateList[0];
+        Result := Concat(Result, COMMA, DOUBLEQUOTE, str, DOUBLEQUOTE);
+
+        Inc(i);
+        if Assigned(StatusBarCallback) and (i mod 50 = 0) then
+          StatusBarCallback(Format('Get_goodWords_from_bufDset: %d', [i]));
+
+        FCandidateList.Delete(0);
+        if FCandidateList.Count = 0 then
+          Break;
+    	until (Length(Result) > MAX_SQL_PARM_LEN -200);
+
+      if Result[1] = COMMA then
+          Result := Result[2..Length(Result)];
+		end;
 
 var
-  i: integer;
-  str: ansistring;
-  word_buf : TBufDataset;
+  i, lst_count: integer;
+  str, str_words: ansistring;
+  word_buf : TStringList;
+  slst : TStringList;
 begin
-  word_buf := Word_Dmod.WordBuffer;
+  //word_buf := Word_Dmod.WordBufList;
   Result := TStringList.Create;
+  Result.Sorted := True;
 
-  if FCandidateStream.Size = 0 then
+  if FCandidateList.Count = 0 then
     raise Exception.Create('Get_goodWords_from_bufDset: Candidate Stream is not built');
 
-  FCandidateStream.Seek(0, soBeginning);
-  str := FCandidateStream.ReadAnsiString;
-  while True do
-  begin
-    if word_buf.Locate('word', str, [loCaseInsensitive]) then
-      Result.Add(str);
-    if FCandidateStream.Position >= FCandidateStream.Size then
-      Break;
-    str := FCandidateStream.ReadAnsiString;
+  lst_count := FCandidateList.Count;
+  while FCandidateList.Count > 0 do
+    begin
+      str_words := build_parameter_string;
+      try
+        if Word_Dmod.Open_word_db then
+          begin
+              slst := TStringList.Create;
+              try
+                 Word_Dmod.qry.ParamByName('words').AsString := str_words;
+                 Word_Dmod.qry.Open;
+                 while not Word_Dmod.qry.EOF do
+                 begin
+                     str := Word_Dmod.qry.Fields[0].AsString;
+                     slst.CommaText := str;
+                     Result.AddStrings(slst);
+                     Word_Dmod.qry.Next;
+								 end;
+								 slst.Clear;
+							except on Ex : Exception do
+                 ShowMessage(Format('TNodeWalker.Get_goodWords_from_bufDset: %s',
+                           [Ex.Message]));
+							end;
+					end;
+				finally
+          Word_Dmod.Close_word_db;
+          slst.Free;
+				end;
+
+      if i = FCandidateList.Count then
+          Break;
+      str_words := '';
   end;
+	{  the "good word" list is built, call method to populate output grid, here!  }
 end;
 
 function TNodeWalker.GetLimitClause: string;
@@ -158,7 +209,7 @@ end;
 constructor TNodeWalker.Create(const aOwner: TComponent);
 begin
   inherited Create(aOwner);
-  //FCandidateList := TStringList.Create;
+  FCandidateList := TStringList.Create;
   FFinalList := TStringList.Create;
 
   //timer_timeout_callback := Timer_timeout;
@@ -167,22 +218,22 @@ end;
 procedure TNodeWalker.setup_walker(tvu: TTreeView; const Height, Width: integer;
   const get_3_ltr_words: boolean);
 begin
-  //FCandidateList.Clear;
+  FCandidateList.Clear;
   FTree := tvu;
   FTreeHeight := Height;
   FTreeWidth := Width;
   FGet3LetterWords := get_3_ltr_words;
   if FTree.Items.Count < 5 then
     ShowMessage('TNodeWalker.Create: empty tree?');
-  FParentHandle := Application.Handle;
   processTree;
+  FinalOutputCountCallBack(0);
+  if FOutputCount = 1 then
+    ShowMessage('TNodeWalker.setup_walker: no good words found!');
 end;
 
 destructor TNodeWalker.Destroy;
 begin
-  //FCandidateList.Free;
-  if Assigned(FCandidateStream) then
-    FCandidateStream.Free;
+  FreeAndNil(FCandidateList);
   FFinalList.Free;
   inherited Destroy;
 end;
@@ -228,6 +279,7 @@ var
   msg: TMessage;
   _cursor: TCursor;
   rec: TPgBarOps;
+  word_list : TStringList;
 const
   statBar_fmt_str = 'Processing %d element of top level node array';
 begin
@@ -240,7 +292,6 @@ begin
   cnt := get_top_level_node_into_array;
 
   Get_temp_file_name;
-  FCandidateStream := TMemoryStream.Create;
   leaf_list := TObjectList.Create;
   lenList := Length(FParentNodeAra);
 
@@ -270,7 +321,10 @@ begin
       Inc(idx);
     end;
 
-    FinalOutputCallback(build_candidate_list(leaf_list));
+    // handle the event where the database returns an empty set
+    word_list := build_candidate_list(leaf_list);
+    //if word_list.Count > 0 then
+    //    FinalOutputCallback(word_list);
   finally
     Inc(idx);
 
@@ -278,8 +332,6 @@ begin
     rec.max := 0;
     rec.step := 0;
     PgBarCallback(rec);
-
-    FCandidateStream.Free;
 
     StatusBarCallback('Freeing heap memory. Get comfortable.');
     leaf_list.Free;
@@ -366,8 +418,8 @@ function TNodeWalker.build_candidate_list(leafList : TObjectList) : TStringList;
 var
   lf_ndx, iwordLen, minWordLen, len_ndx: integer;
   sz: QWord;
-  leaf_list_count: integer;
-  sCandidate: AnsiString;
+  leaf_list_count, db_result_count: integer;
+  sCandidate, s: AnsiString;
 begin
   minWordLen := 4;
   if FGet3LetterWords then
@@ -376,7 +428,7 @@ begin
   lf_ndx := 0;
   len_ndx := FTreeWidth;    // len_ndx will be dec'd downto minWordLen
 
-  FCandidateStream.Clear;
+  FCandidateList.Clear;
   leaf_list_count := leafList.Count;
   try
     while lf_ndx < leafList.Count do
@@ -388,14 +440,29 @@ begin
         if String(sCandidate) = '' then
           raise Exception.Create('TNodeWalker.build_candidate_list: '
                     + 'build_candidate returned an empty string.');
-        FCandidateStream.WriteAnsiString(sCandidate);
+
+        // ensure FCandidateList is unique
+        if FCandidateList.IndexOf(sCandidate) = -1 then
+          FCandidateList.Add(sCandidate);
+
         Inc(lf_ndx);
         if lf_ndx = leafList.Count then
           Break;      // the inner loop
       end;
-      CandidateCallback(FCandidateStream);
-      Result := Get_goodWords_from_bufDset;
-      FCandidateStream.Clear;
+
+      // this is a call to TV.Populate_raw_words
+      CandidateCallback(FCandidateList);
+      Result := Get_goodWords_from_qry;
+      db_result_count := Result.Count;
+      if Result.Count > 0 then
+        {  this may happen for a variety of reasons, e.g., user input
+            all consonants. Now, to handle it.  }
+        begin
+            FinalOutputCallback(Result);
+    			//ShowMessage('build_candidate_list: query has returned an empty set.');
+          //Exit;
+				end;
+      FCandidateList.Clear;
 
       if len_ndx = minWordLen then
         Break;      // the outer loop
@@ -404,8 +471,7 @@ begin
       lf_ndx := 0;
     end;
   finally
-    if Assigned(FCandidateStream) then
-      FCandidateStream.Clear;
+    FCandidateList.Clear;
   end;
 end;
 

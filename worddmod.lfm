@@ -1,13 +1,48 @@
 object Word_Dmod: TWord_Dmod
   OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
   OldCreateOrder = False
-  Height = 265
-  HorizontalOffset = 1101
-  VerticalOffset = 412
+  Height = 241
+  HorizontalOffset = 1111
+  VerticalOffset = 560
   Width = 352
-  object WordBuffer: TBufDataset
+  object qry: TSQLQuery
     FieldDefs = <>
-    Left = 112
-    Top = 64
+    Database = sqlConn
+    Transaction = tx
+    SQL.Strings = (
+      'call sp_GET_GOOD_WORDS(:words) ;'
+    )
+    Params = <    
+      item
+        DataType = ftUnknown
+        Name = 'words'
+        ParamType = ptInput
+      end>
+    Macros = <>
+    Left = 56
+    Top = 32
+  end
+  object sqlConn: TMySQL57Connection
+    Connected = False
+    LoginPrompt = True
+    DatabaseName = 'wordscape'
+    KeepConnection = False
+    Params.Strings = (
+      'Port=3306'
+    )
+    Password = 'j33ves99'
+    Transaction = tx
+    UserName = 'sherril'
+    HostName = 'localhost'
+    SkipLibraryVersionCheck = False
+    Left = 176
+    Top = 32
+  end
+  object tx: TSQLTransaction
+    Active = False
+    Database = sqlConn
+    Left = 56
+    Top = 96
   end
 end

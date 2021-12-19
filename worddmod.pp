@@ -7,14 +7,14 @@ interface
 
 uses
   Classes, SysUtils, SQLDB, BufDataset, DB, memds, PQConnection, odbcconn,
-	Dialogs, mysql57conn, mysql80conn, LMessages, LCLIntf, Messages, fgl, Grids,
-	ExtCtrls, Contnrs;
+  Dialogs, mysql57conn, mysql80conn, LMessages, LCLIntf, Messages, fgl, Grids,
+  ExtCtrls, Contnrs;
 
 type
   { TPgBarOps }
   TPgBarOps = record
-    arg, max, step : Integer;
-	end;
+    arg, max, step: integer;
+  end;
 
   EWordsDbException = class(Exception);
   TCallbackMethod = procedure(msg: TMessage) of object;
@@ -24,11 +24,11 @@ type
   TMemoryStreamCallbackMethod = procedure(strm: TMemoryStream) of object;
 
   TFileStreamCallbackMethod = procedure(fl: TFileStream) of object;
-  TStringCallbackMethod = procedure(str : String) of object;
-  TPgBarCallbackMethod = procedure(rec : TPgBarOps) of object;
-  TTimerTimeoutMethod = procedure(Sender : TObject) of object;
-  TIntegerCallbackMethod = procedure(_int_ : Integer) of object;
-  TStatBarCallbackMethod = procedure(msg : String) of object;
+  TStringCallbackMethod = procedure(str: string) of object;
+  TPgBarCallbackMethod = procedure(rec: TPgBarOps) of object;
+  TTimerTimeoutMethod = procedure(Sender: TObject) of object;
+  TIntegerCallbackMethod = procedure(_int_: integer) of object;
+  TStatBarCallbackMethod = procedure(msg: string) of object;
 
 const
   INIT_PGBAR = -1;
@@ -39,44 +39,44 @@ type
   { TWord_Dmod }
 
   TWord_Dmod = class(TDataModule)
-		WordBuffer : TBufDataset;
-		WordBufferid : TAutoIncField;
-		WordBufferword : TStringField;
+    sqlConn: TMySQL57Connection;
+    qry: TSQLQuery;
+    tx: TSQLTransaction;
+    //WordBufList: TStringList;
     procedure DataModuleCreate(Sender: TObject);
+    procedure DataModuleDestroy(Sender: TObject);
 
   public
-    StatBarCallback : TStatBarCallbackMethod;
-    PgBarCallback : TPgBarCallbackMethod;
+    StatBarCallback: TStatBarCallbackMethod;
+    PgBarCallback: TPgBarCallbackMethod;
 
-    procedure Populate_mem_dataset(lst : TStrings);
+    procedure Populate_WordBufList(lst: TStrings);
+    function Open_word_db : Boolean;
+    function Close_word_db : Boolean;
+		function Do_exec_sql(_sql : String) : Boolean;
   end;
 
-	{ TMyObjList }
+  { TMyObjList }
 
-  TMyObjList = class (TObjectList)
+  TMyObjList = class(TObjectList)
     procedure Free; reintroduce;
-	end;
+  end;
 
   { TLeafList_file }
   TLeafList_file = class(TFileStream)
-    FFileName : String;
-    FStr_len : Integer;
-    FDir : TFileName;
+    FFileName: string;
+    FStr_len: integer;
+    FDir: TFileName;
 
-    public
-      constructor Create(const str_len : Integer); reintroduce;
-      //function Read_next : String;
-      //procedure Write(const str : String);
-	end;
+  public
+    constructor Create(const str_len: integer); reintroduce;
+  end;
 
   { TLeafList_file_list }
   TLeafList_file_list = class(TObjectList)
-    public
-      constructor Create(file_count : Integer);
-	end;
-
-var
-  MainFormHandle: THandle;
+  public
+    constructor Create(file_count: integer);
+  end;
 
 const
   WORDS_INSERT_SQL = 'insert into words (word) values (:word)';
@@ -91,7 +91,7 @@ const
   LM_GET_MAIN_WINDOW_HANDLE = LM_USER + 2;
   LM_TEST_THE_HANDLE = LM_USER + 3;
 
-  MAX_SQL_PARM_LEN = 4000;
+  MAX_SQL_PARM_LEN = 16000;
   ALPHA_CHARS = ['A'..'Z', 'a'..'z'];
 
 var
@@ -102,20 +102,23 @@ var
   {$ENDIF}
 
 function multiple_chars(_s: string; multiplier: integer): string;
-procedure Clear_string_grid(sgrid : TStringGrid;
-                            col_count : integer = 1;
-                            row_count : integer = 1;
-                            fixed_col_count : integer = 1;
-                            fixed_row_count : integer = 1);
+procedure Clear_string_grid(sgrid: TStringGrid;
+  col_count: integer = 1;
+  row_count: integer = 1;
+  fixed_col_count: integer = 1;
+  fixed_row_count: integer = 1);
 
 
 var
-  Temp_dir, Temp_file_name : AnsiString;
-  WordsFile : TFileName;
+  Temp_dir, Temp_file_name: ansistring;
+  WordsFile: TFileName;
 
 procedure Get_temp_file_name;
+function isRowEmpty(grid: TStringGrid; row : Integer) : Boolean;
 
 implementation
+
+uses StrUtils;
 
 {$R *.lfm}
 
@@ -134,9 +137,9 @@ begin
     Result := Result + _s;
 end;
 
-procedure Clear_string_grid(sgrid : TStringGrid;
-                        col_count : integer; row_count : integer;
-			fixed_col_count : integer; fixed_row_count : integer);
+procedure Clear_string_grid(sgrid: TStringGrid;
+  col_count: integer; row_count: integer;
+  fixed_col_count: integer; fixed_row_count: integer);
 begin
   sgrid.Clear;
   sgrid.ColCount := col_count;
@@ -165,24 +168,37 @@ begin
   for i := 1 to 20 do
     Texto := Texto + IntToHex(Output[i], 1);
   ShowMessage(Texto);
-
 end;
+
+function isRowEmpty(grid: TStringGrid; row : Integer) : Boolean;
+var
+  col : Integer;
+begin
+  Result := True;
+  for col := 0 to grid.ColCount -1 do
+     if grid.Cells[col, row] > '' then
+       begin
+         Result := False;
+         Exit;
+		   end;
+end;
+
 
 { TLeafList_file_list }
 
-constructor TLeafList_file_list.Create(file_count : Integer);
+constructor TLeafList_file_list.Create(file_count: integer);
 var
-  i : Integer;
-  obj : TLeafList_file;
+  i: integer;
+  obj: TLeafList_file;
 begin
   inherited Create(True);
   i := 0;
   while i < file_count do
   begin
-    obj := TLeafList_file.Create(i +2);
+    obj := TLeafList_file.Create(i + 2);
     self.Add(obj);
-    Inc(i)
-	end;
+    Inc(i);
+  end;
 end;
 
 { TMyObjList }
@@ -200,72 +216,88 @@ procedure TWord_Dmod.DataModuleCreate(Sender: TObject);
 begin
   StatBarCallback := nil;
   PgBarCallback := nil;
+  sqlConn.Close(True);
 end;
 
-procedure TWord_Dmod.Populate_mem_dataset(lst : TStrings);
+procedure TWord_Dmod.DataModuleDestroy(Sender: TObject);
+begin
+  //FreeAndNil(WordBufList);
+end;
+
+procedure TWord_Dmod.Populate_WordBufList(lst: TStrings);
+var
+  i: integer;
+  pbRec: TPgBarOps;
+begin
+  //WordBufList.AddStrings(lst);
+  //i := WordBufList.Count;
+  //Exit;
+end;
+
+function TWord_Dmod.Open_word_db : Boolean;
 var
   i : Integer;
-  pbRec : TPgBarOps;
 begin
+  sqlConn.Open;
+  Result := sqlConn.Connected;
   i := 0;
-  try
-    pbRec.arg := INIT_PGBAR;
-    pbRec.max := lst.Count -1;
-    pbRec.step := MAXINT;
-    PgBarCallback(pbRec);
+  if Result then Exit;
 
-    //WordBuffer.FieldDefs.Add('id',ftInteger);
-    WordBuffer.FieldDefs.Add('word',ftString,45);
-    WordBuffer.CreateDataset;
-    WordBuffer.Open;
-    try
-      while i < lst.Count  do
-      begin
-        if lst[i] = '' then
-          Continue;
-        if i mod 500 = 0 then
-        begin
-          if Assigned(PgBarCallback) then
-            begin
-              pbRec.arg := STEP_PGBAR;
-              PgBarCallback(pbRec);
-						end;
-					if Assigned(StatBarCallback) then
-            StatBarCallback(Format('Loading record #: %d', [i]));
-          //Application.ProcessMessages;
-				end;
-				WordBuffer.Append;
-        //WordBuffer.FieldByName('id').AsInteger := i + 1;
-        WordBuffer.FieldByName('word').AsString := lst[i];
-        WordBuffer.Post;
-        Inc(i);
-      end;
-      WordBuffer.SaveToFile('WordBuffer.txt');  // as long you do not close, you
-    except on Ex : Exception do
-      begin
-        ShowMessage(Format('LoadBufDataset exception at record %d.'
-                +LineEnding +#09 +'Exception %s',
-                [i, Ex.Message]));
-      end;
+  repeat
+      Sleep(250);
+      sqlConn.Open;
+      Result := sqlConn.Connected;
+      if Result then
+        Exit;
+  until i = 5;
 
-		end;
-    WordBuffer.IndexDefs.Add('WordDx','word',[ixUnique,ixCaseInsensitive]);
-
-finally  if Assigned(PgBarCallback) then
-    begin
-      pbRec.arg := INIT_PGBAR;
-      pbRec.max := 0;
-      PgBarCallback(pbRec);
-		end;
-	if Assigned(StatBarCallback) then
-    StatBarCallback(Format('Loaded %d records', [i]));
+  raise EDatabaseError.Create('TWord_Dmod.Open_word_db: failed to open');
 end;
+
+function TWord_Dmod.Close_word_db : Boolean;
+begin
+  sqlConn.Close(True);
+  Result := not sqlConn.Connected;
+end;
+
+function TWord_Dmod.Do_exec_sql(_sql : String): Boolean;
+var
+  q : TSQLQuery;
+begin
+  Result := False;
+  q := TSQLQuery.Create(self);
+  try
+    q.DataBase := sqlConn;
+    q.Transaction := tx;
+    q.SQL.Text := _sql;
+    try
+        q.ExecSQL;
+        Word_Dmod.tx.Commit;
+        Result := True;
+		except
+      on Ex : EDatabaseError do
+      begin
+        if AnsiContainsText(Ex.Message, 'duplicate') then
+          Exit;
+
+        ShowMessage('TV.ActAdd_2_dbExecute: database exception: ' +Ex.Message);
+        Word_Dmod.tx.Rollback;
+			end;
+			on Ex : Exception do
+      begin
+        ShowMessage('TV.ActAdd_2_dbExecute: unknown exception: ' +Ex.Message);
+        tx.Rollback;
+			end;
+		end;
+	finally
+    q.Free;
+	end;
 
 end;
 
 { TLeafList_file }
 
-constructor TLeafList_file.Create(const str_len : Integer);
+constructor TLeafList_file.Create(const str_len: integer);
 begin
   Get_temp_file_name;
   FDir := Temp_dir;
@@ -281,11 +313,3 @@ initialization
   {$ENDIF}
 
 end.
-
-
-
-
-
-
-
-

@@ -29,6 +29,7 @@ function PermutationCount(const num, takeAt: Integer) : Integer;
 function PermutationCount_ex(const num, takeAt, minLen: Integer) : Integer;
 function CleanDuplicateChars(Str: string): string;
 function CleanString(Str: string): string;
+function Is_all_consanants(Str : String) : Boolean;
 
 implementation
 
@@ -130,6 +131,20 @@ begin
   if Str[1] in ['A'..'Z'] then
       rslt := Concat(rslt, Str[i]);
 	Result := rslt;
+end;
+
+function Is_all_consanants(Str : String) : Boolean;
+var
+  i : Integer;
+begin
+  Result := True;
+  Str := LowerCase(Str);
+  for i := 1 to Length(Str) do
+    if Str[i] in ['a', 'e', 'i', 'o', 'u', 'y'] then
+      begin
+        Result := False;
+        Exit;
+			end;
 end;
 
 { TTestFile }
