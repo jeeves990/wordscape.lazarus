@@ -11,6 +11,7 @@
         <EditorIndex Value="-1"/>
         <CursorPos Y="15"/>
         <UsageCount Value="200"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="WordScapes.pas"/>
@@ -19,18 +20,19 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="1007"/>
-        <CursorPos Y="1041"/>
-        <FoldState Value=" TKqa08q"/>
+        <TopLine Value="1082"/>
+        <CursorPos X="55" Y="1089"/>
         <UsageCount Value="200"/>
         <Bookmarks Count="5">
-          <Item0 Y="440" ID="7"/>
-          <Item1 X="21" Y="339" ID="8"/>
-          <Item2 Y="503" ID="6"/>
-          <Item3 X="32" Y="621" ID="4"/>
-          <Item4 X="58" Y="483" ID="9"/>
+          <Item0 Y="450" ID="7"/>
+          <Item1 X="21" Y="349" ID="8"/>
+          <Item2 Y="513" ID="6"/>
+          <Item3 X="32" Y="631" ID="4"/>
+          <Item4 X="58" Y="493" ID="9"/>
         </Bookmarks>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="Logging.pas"/>
@@ -39,6 +41,7 @@
         <EditorIndex Value="-1"/>
         <CursorPos X="36" Y="10"/>
         <UsageCount Value="200"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="Frame4WS.pas"/>
@@ -58,6 +61,7 @@
         <TopLine Value="12"/>
         <CursorPos X="24" Y="28"/>
         <UsageCount Value="200"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="loadwordsfromfile2db.pp"/>
@@ -70,6 +74,7 @@
         <TopLine Value="56"/>
         <CursorPos X="26"/>
         <UsageCount Value="200"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="worddmod.pp"/>
@@ -91,10 +96,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="frmCompWord_W_DB"/>
-        <EditorIndex Value="2"/>
-        <TopLine Value="339"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="338"/>
         <CursorPos Y="457"/>
-        <FoldState Value=" T3of0a0115"/>
         <UsageCount Value="200"/>
         <Bookmarks Count="2">
           <Item0 X="24" Y="454" ID="1"/>
@@ -102,12 +106,13 @@
         </Bookmarks>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
       <Unit>
         <Filename Value="wordscapehelper.pp"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="WordscapeHelper"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="117"/>
         <CursorPos X="15" Y="138"/>
         <UsageCount Value="202"/>
@@ -202,10 +207,11 @@
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\comctrls.pp"/>
         <UnitName Value="ComCtrls"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="586"/>
-        <CursorPos X="14" Y="605"/>
-        <UsageCount Value="9"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="1579"/>
+        <CursorPos X="15" Y="1599"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\include\custommemo.inc"/>
@@ -297,11 +303,10 @@
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\grids.pas"/>
         <UnitName Value="Grids"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="11084"/>
         <CursorPos Y="11101"/>
-        <UsageCount Value="11"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="12"/>
       </Unit>
       <Unit>
         <Filename Value="D:\lazarus_64\lcl\lclmessageglue.pas"/>
@@ -395,127 +400,135 @@
         <TopLine Value="78"/>
         <UsageCount Value="10"/>
       </Unit>
+      <Unit>
+        <Filename Value="..\BooksInventory\csvparser_setup.pp"/>
+        <ComponentName Value="fmCSVParser_setup"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="CSVParser_setup"/>
+        <EditorIndex Value="2"/>
+        <UsageCount Value="12"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+        <DefaultSyntaxHighlighter Value="Delphi"/>
+      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
+    <JumpHistory HistoryIndex="28">
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1028" TopLine="1006"/>
+        <Caret Line="1104" Column="26" TopLine="1072"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1035" TopLine="1006"/>
+        <Caret Line="1099" Column="50" TopLine="1072"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1006"/>
+        <Caret Line="1097" Column="70" TopLine="1068"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1028" TopLine="1006"/>
+        <Caret Line="834" Column="5" TopLine="822"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1035" TopLine="1006"/>
+        <Caret Line="866" TopLine="855"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1006"/>
+        <Caret Line="1088" TopLine="1083"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1028" TopLine="1006"/>
+        <Caret Line="865" Column="17" TopLine="862"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1035" TopLine="1006"/>
+        <Caret Line="866" Column="31" TopLine="862"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1006"/>
+        <Caret Line="875" Column="8" TopLine="856"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1038" TopLine="1006"/>
+        <Caret Line="876" Column="8" TopLine="857"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1017" TopLine="1006"/>
+        <Caret Line="875" Column="8" TopLine="856"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1020" TopLine="1006"/>
+        <Caret Line="876" Column="8" TopLine="857"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1023" TopLine="1006"/>
+        <Caret Line="877" Column="8" TopLine="858"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1025" TopLine="1006"/>
+        <Caret Line="878" Column="8" TopLine="859"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1006"/>
+        <Caret Line="879" Column="8" TopLine="840"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1028" TopLine="1006"/>
+        <Caret Line="1029" Column="35" TopLine="1004"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1035" TopLine="1006"/>
+        <Caret Line="337" Column="22" TopLine="308"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1006"/>
+        <Caret Line="1005" Column="48" TopLine="947"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1028" TopLine="1006"/>
+        <Caret Line="146" Column="18" TopLine="125"/>
+      </Position>
+      <Position>
+        <Filename Value="D:\lazarus_64\lcl\comctrls.pp"/>
+        <Caret Line="605" Column="14" TopLine="586"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1035" TopLine="1006"/>
+        <Caret Line="1097" Column="16" TopLine="1066"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1006"/>
+        <Caret Line="1133" Column="55" TopLine="1057"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1028" TopLine="1006"/>
+        <Caret Line="31" Column="12" TopLine="10"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1035" TopLine="1006"/>
+        <Caret Line="146" Column="22" TopLine="114"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1006"/>
+        <Caret Line="1098" Column="38" TopLine="1066"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1028" TopLine="1006"/>
+        <Caret Line="1101" Column="26" TopLine="1081"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1035" TopLine="1006"/>
+        <Caret Line="1067" Column="26" TopLine="1063"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1006"/>
+        <Caret Line="138" Column="13" TopLine="127"/>
       </Position>
       <Position>
         <Filename Value="WordScapes.pas"/>
-        <Caret Line="1028" TopLine="1006"/>
-      </Position>
-      <Position>
-        <Filename Value="WordScapes.pas"/>
-        <Caret Line="1035" TopLine="1006"/>
-      </Position>
-      <Position>
-        <Filename Value="WordScapes.pas"/>
-        <Caret Line="1026" TopLine="1005"/>
+        <Caret Line="146" Column="13" TopLine="128"/>
       </Position>
     </JumpHistory>
     <RunParams>

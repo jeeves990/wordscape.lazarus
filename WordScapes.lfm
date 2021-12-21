@@ -1,7 +1,7 @@
 object V: TV
-  Left = 1234
+  Left = 1269
   Height = 634
-  Top = 126
+  Top = 214
   Width = 611
   Caption = 'WordScapes word list'
   ClientHeight = 614
@@ -546,6 +546,7 @@ object V: TV
   Menu = mnMnu
   OnClose = FormClose
   OnCreate = FormCreate
+  OnKeyUp = FormKeyUp
   SessionProperties = 'Caption;ckb_take_threes.Checked;dbop_splitter.Left;edCharString.Text;Height;Left;Top;tvu.Items;tvu_splitter.Left;Width;pnl_for_output_grid.Width;pnl_for_words_memo.Width;pnl_words_grid.Width;pnlTesting.Width;pnlTvu.Width;pnlTvuTop.Width'
   LCLVersion = '2.2.0.1'
   Visible = True
@@ -805,26 +806,26 @@ object V: TV
       ClientHeight = 402
       ClientWidth = 603
       object dbop_splitter: TSplitter
-        Left = 258
+        Left = 170
         Height = 402
         Top = 0
         Width = 5
       end
       object pnl_for_output_grid: TPanel
-        Left = 263
+        Left = 271
         Height = 402
         Top = 0
-        Width = 340
+        Width = 332
         Align = alClient
         Caption = 'Panel_for_output_grid'
         ClientHeight = 402
-        ClientWidth = 340
+        ClientWidth = 332
         TabOrder = 1
         object cap_output_grid: TLabel
           Left = 1
           Height = 13
-          Top = 1
-          Width = 338
+          Top = 27
+          Width = 330
           Align = alTop
           Alignment = taCenter
           Caption = 'Output grid'
@@ -833,7 +834,7 @@ object V: TV
           Left = 1
           Height = 361
           Top = 40
-          Width = 338
+          Width = 330
           Align = alClient
           AlternateColor = 16377593
           Anchors = []
@@ -848,8 +849,8 @@ object V: TV
         object ToolBar1: TToolBar
           Left = 1
           Height = 26
-          Top = 14
-          Width = 338
+          Top = 1
+          Width = 330
           Caption = 'ToolBar1'
           Images = imgList
           TabOrder = 1
@@ -885,17 +886,17 @@ object V: TV
         Left = 0
         Height = 402
         Top = 0
-        Width = 258
+        Width = 170
         Align = alLeft
         Caption = 'Panel for words memo'
         ClientHeight = 402
-        ClientWidth = 258
+        ClientWidth = 170
         TabOrder = 2
         object cap_words_memo: TLabel
           Left = 1
           Height = 13
           Top = 1
-          Width = 256
+          Width = 168
           Align = alTop
           Alignment = taCenter
           Caption = 'All the words available'
@@ -904,7 +905,7 @@ object V: TV
           Left = 1
           Height = 387
           Top = 14
-          Width = 256
+          Width = 168
           Align = alClient
           AlternateColor = 10223488
           Color = 16777060
@@ -918,6 +919,53 @@ object V: TV
           TabOrder = 0
           OnKeyUp = all_words_gridKeyUp
         end
+      end
+      object Panel2: TPanel
+        Left = 175
+        Height = 402
+        Top = 0
+        Width = 91
+        Align = alLeft
+        ClientHeight = 402
+        ClientWidth = 91
+        TabOrder = 3
+        object Label1: TLabel
+          Left = 1
+          Height = 13
+          Top = 1
+          Width = 89
+          Align = alTop
+          Alignment = taCenter
+          Caption = 'Words delta'
+        end
+        object delta_lstVu: TListView
+          Left = 1
+          Height = 387
+          Top = 14
+          Width = 89
+          Align = alClient
+          AutoSortIndicator = True
+          Color = 15710959
+          Columns = <          
+            item
+              Caption = 'Word'
+              MinWidth = 50
+            end          
+            item
+              Caption = 'How'
+              MinWidth = 25
+              Width = 33
+            end>
+          GridLines = True
+          TabOrder = 0
+          ViewStyle = vsReport
+        end
+      end
+      object Splitter1: TSplitter
+        Left = 266
+        Height = 402
+        Top = 0
+        Width = 5
       end
     end
     object tsTesting: TTabSheet
@@ -1212,12 +1260,19 @@ object V: TV
       ImageIndex = 14
       OnExecute = ActRemoveWordExecute
     end
+    object ActSaveDB_2_txt: TAction
+      Caption = 'Save database to words.txt'
+      OnExecute = ActSaveDB_2_txtExecute
+    end
   end
   object mnMnu: TMainMenu
     Left = 64
     Top = 384
     object File1: TMenuItem
       Caption = 'File'
+      object MenuItem4: TMenuItem
+        Action = ActSaveDB_2_txt
+      end
       object N1: TMenuItem
         Caption = '-'
       end

@@ -27,6 +27,7 @@ type
     ActGetFile: TAction;
     ActGetStarted: TAction;
 		ActAdd_2_db : TAction;
+		ActSaveDB_2_txt : TAction;
 		ActRemoveWord : TAction;
     ActionTestCalculate: TAction;
     ActLoadSelection: TAction;
@@ -57,6 +58,7 @@ type
     edTvuItmCount: TEdit;
     File1: TMenuItem;
     imgList: TImageList;
+		Label1 : TLabel;
     lblCombinationCount: TLabel;
     lblFinalCount: TLabel;
     lblIteratorI: TLabel;
@@ -69,9 +71,11 @@ type
     lblTakeAt: TLabel;
     lblTakeAt1: TLabel;
     lblTvuItemCount: TLabel;
+		delta_lstVu : TListView;
     MenuItem1: TMenuItem;
 		MenuItem2 : TMenuItem;
 		MenuItem3 : TMenuItem;
+		MenuItem4 : TMenuItem;
     MenuItem6: TMenuItem;
     mnMnu: TMainMenu;
     mnuItm_bld_sub_trees: TMenuItem;
@@ -89,6 +93,7 @@ type
     N6: TMenuItem;
     N7: TMenuItem;
     Panel1: TPanel;
+		Panel2 : TPanel;
     pgBar: TProgressBar;
     pgCtrl: TPageControl;
     pgCtrl_ex: TPageControl;
@@ -104,6 +109,7 @@ type
     sgrid_raw_words: TStringGrid;
     dbop_splitter: TSplitter;
 		all_words_grid : TStringGrid;
+		Splitter1 : TSplitter;
 		ToolBar1 : TToolBar;
 		ToolButton10 : TToolButton;
 		ToolButton7 : TToolButton;
@@ -138,6 +144,7 @@ type
     procedure ActLoadWordsExecute(Sender: TObject);
     procedure ActNodeWalkerExecute(Sender: TObject);
 		procedure ActRemoveWordExecute(Sender : TObject);
+		procedure ActSaveDB_2_txtExecute(Sender : TObject);
     procedure BtnCloseClick(Sender: TObject);
     procedure Close1Click(Sender: TObject);
     procedure edCharStringKeyDown(Sender: TObject; var Key: word;
@@ -145,6 +152,7 @@ type
     procedure edCharStringKeyUp(Sender: TObject; var Key: word; Shift: TShiftState);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
+		procedure FormKeyUp(Sender : TObject; var Key : Word; Shift : TShiftState);
     procedure MaskEditEnter(Sender: TObject);
     procedure mnuItm_expose_test_tabClick(Sender: TObject);
 		procedure sGrid_outputDblClick(Sender : TObject);
@@ -326,8 +334,10 @@ begin
     FStartString := UpperCase(edCharString.Text);
     buildATree(tvu, Length(FStartString));
     set_actions(build_tree);
+    delta_lstVu.Clear;
   finally
     CursorFeedback(_cursor);
+
   end;
   ActNodeWalker.Execute;
 end;
@@ -855,11 +865,23 @@ begin
   Application.QueueAsyncCall(AfterCreate, 0);
 end;
 
+procedure TV.FormKeyUp(Sender : TObject; var Key : Word; Shift : TShiftState);
+begin
+  case Key of
+    VK_INSERT : ActAdd_2_db.Execute;
+    VK_DELETE : ActRemoveWord.Execute;
+	end;
+end;
+
 procedure TV.AfterCreate(ptr : IntPtr);
+const
+  _sql = 'SELECT word FROM words';
 var
   lst : TStringList;
+  qry : TSQLQuery;
 begin
   lst := TStringList.Create;
+  qry := TSQLQuery.Create(self);
   try
     lst.LoadFromFile(WordsFile);
     all_words_grid.RowCount := lst.Count;
@@ -868,6 +890,7 @@ begin
 
 	finally
     FreeAndNil(lst);
+    qry.Free;
 	end;
 	Application.QueueAsyncCall(Bld_alpha_list, 0);
 end;
@@ -999,12 +1022,19 @@ const
   _sql = 'INSERT INTO words (word) VALUES (%s)';
 var
   aWord, s : String;
+  itm : TListItem;
 begin
   if not InputQuery('Add word to database', 'Enter word to add', aWord) then
     Exit;
 
   s :=  Format(_sql, [QuotedStr(aWord)]);
-  Word_Dmod.Do_exec_sql(s);
+  if Word_Dmod.Do_exec_sql(s) then
+    begin
+        itm := TListItem.Create(delta_lstVu.Items);
+        itm.Caption := aWord;
+        itm.SubItems.Add('+++');
+        delta_lstVu.Items.AddItem(itm);
+    end;
 end;
 
 procedure Pack_column(grid : TStringGrid; col : Integer);
@@ -1047,7 +1077,8 @@ var
   aWord, s : String;
   q : TSQLQuery;
   row, col : Integer;
-  b_cellValue : Boolean;
+  b, b_cellValue : Boolean;
+  itm : TListItem;
 begin
   aWord := '';
   row := 1;
@@ -1063,13 +1094,52 @@ begin
   then  Exit;
 
   s :=  Format(_sql, [QuotedStr(aWord)]);
-  if Word_Dmod.Do_exec_sql(s) and b_cellValue then
+  b := Word_Dmod.Do_exec_sql(s);
+  if b and b_cellValue then
     begin
       sGrid_output.Cells[col, row] := '';
       sGrid_output.Refresh;
       Pack_column(sgrid_output, col);
-      sGrid_output.Refresh;
 		end;
+  if b then
+    begin
+      itm := TListItem.Create(delta_lstVu.Items);
+      itm.Caption := aWord;
+      itm.SubItems.Add('---');
+      delta_lstVu.Items.AddItem(itm);
+      sGrid_output.Refresh;
+    end;
+end;
+
+procedure TV.ActSaveDB_2_txtExecute(Sender : TObject);
+const
+  _sql = 'SELECT word FROM words';
+var
+  qry : TSQLQuery;
+  fl : TextFile;
+  s : String;
+begin
+  AssignFile(fl, WordsFile);
+  Rewrite(fl);
+  qry := TSQLQuery.Create(self);
+  try
+    qry.DataBase := Word_Dmod.sqlConn;
+    qry.Transaction := Word_Dmod.tx;
+    qry.SQL.Text := _sql;
+    Word_Dmod.Open_word_db;
+    qry.Open;
+    qry.First;
+    while not qry.EOF do
+      begin
+        s := qry.Fields[0].AsString;
+        WriteLn(fl, s);
+        qry.Next;
+			end;
+	finally
+    CloseFile(fl);
+    qry.Free;
+    Word_Dmod.Close_word_db;
+	end;
 end;
 
 procedure TV.ActLoadWordsExecute(Sender: TObject);

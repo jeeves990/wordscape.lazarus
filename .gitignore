@@ -22,7 +22,7 @@
 # Compiled source #
 ###################
 **/*.dll
-**/*.exe
+#**/*.exe
 
 # Packages #
 ############
